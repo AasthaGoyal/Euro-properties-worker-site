@@ -49,40 +49,49 @@ export const demoPages = {
 	UserPages: {
 		id: 'users',
 		text: 'Users',
-		path: 'list-pages',
-		icon: 'Article',
+		path: 'user-pages',
+		icon: 'Person',
 		subMenu: {
+      addUsers: {
+				id: 'addUsers',
+				text: 'Add New User',
+				path: 'user-pages/addUser',
+				icon: 'AddCircle',
+			},
 			listUsers: {
 				id: 'listUsers',
-				text: 'Employees',
-				path: 'list-pages/boxed-list',
-				icon: 'ViewArray',
+				text: 'View Users',
+				path: 'user-pages/viewUsers',
+				icon: 'EmojiPeople',
 			},
-			addUsers: {
-				id: 'addUsers',
-				text: 'Managers',
-				path: 'list-pages/fluid-list',
-				icon: 'ViewDay',
+      editUser: {
+				id: 'editUsers',
+        visibility: false,
+				text: 'Edit Users',
+				path: 'user-pages/editUsers',
+				icon: 'EmojiPeople',
 			},
+			
+  
 		},
 	},
 	listPages: {
 		id: 'listPages',
 		text: 'Job sites',
 		path: 'list-pages',
-		icon: 'Dvr',
+		icon: 'Business',
 		subMenu: {
 			listBoxed: {
 				id: 'listBoxed',
 				text: 'Add Jobsite',
 				path: 'list-pages/boxed-list',
-				icon: 'ViewArray',
+				icon: 'AddBox',
 			},
 			listFluid: {
 				id: 'listFluid',
 				text: 'Assign Jobsite',
 				path: 'list-pages/fluid-list',
-				icon: 'ViewDay',
+				icon: 'Build',
 			},
 		},
 	},
@@ -90,31 +99,31 @@ export const demoPages = {
 		id: 'gridPages',
 		text: 'Tasks',
 		path: 'grid-pages',
-		icon: 'Window'
+		icon: 'Task'
 	},
   invoices: {
 		id: 'invoices',
 		text: 'Invoices & Payslips',
 		path: 'grid-pages',
-		icon: 'Window'
+		icon: 'PointOfSale'
 	},
 	editPages: {
 		id: 'editPages',
-		text: 'Vehciles',
+		text: 'Vehicles',
 		path: 'edit-pages',
-		icon: 'drive_file_rename_outline ',
+		icon: 'Train ',
 		subMenu: {
 			editBoxed: {
 				id: 'editBoxed',
-				text: 'Add vehicle',
+				text: 'Add Vehicle',
 				path: 'edit-pages/boxed',
-				icon: 'ViewArray',
+				icon: 'AddLocation',
 			},
 			editFluid: {
 				id: 'editFluid',
-				text: 'Assign Vehicle',
+				text: 'View/Assign Vehicle',
 				path: 'edit-pages/fluid',
-				icon: 'ViewDay',
+				icon: 'TaxiAlert',
 			},
 		},
 	},
@@ -122,13 +131,13 @@ export const demoPages = {
 		id: 'pricingTable',
 		text: 'Materials',
 		path: 'pricing-table',
-		icon: 'Local Offer',
+		icon: 'Palette',
 	},
   reports: {
 		id: 'reports',
 		text: 'Reports',
 		path: 'pricing-table',
-		icon: 'Local Offer',
+		icon: 'Receipt',
 	},
 
 	auth: {
@@ -155,45 +164,7 @@ export const demoPages = {
 		path: 'auth-pages/404',
 		icon: 'ReportGmailerrorred',
 	},
-	sales: {
-		id: 'sales',
-		text: 'Sales',
-		path: 'sales',
-		icon: 'Store',
-		subMenu: {
-			dashboard: dashboardMenu.dashboard,
-			salesList: {
-				id: 'products',
-				text: 'Sales List',
-				path: 'sales/sales-list',
-				icon: 'FactCheck',
-			},
-			productsGrid: {
-				id: 'productsGrid',
-				text: 'Products Grid',
-				path: 'sales/grid',
-				icon: 'CalendarViewMonth',
-			},
-			productID: {
-				id: 'productID',
-				text: 'productID',
-				path: 'sales/product',
-				hide: true,
-			},
-			product: {
-				id: 'product',
-				text: 'Product',
-				path: 'sales/product/1',
-				icon: 'QrCode2',
-			},
-			transactions: {
-				id: 'transactions',
-				text: 'Transactions',
-				path: 'sales/transactions',
-				icon: 'PublishedWithChanges',
-			},
-		},
-	},
+
 
 
 };
@@ -700,71 +671,6 @@ export const componentsMenu = {
 		text: 'Hooks',
 		path: 'hooks',
 		icon: 'Anchor',
-	},
-};
-
-export const layoutMenu = {
-	layoutTypes: {
-		id: 'layoutTypes',
-		text: 'Page Layout Types',
-	},
-	blank: {
-		id: 'blank',
-		text: 'Blank',
-		path: 'page-layouts/blank',
-		icon: 'check_box_outline_blank ',
-	},
-	pageLayout: {
-		id: 'pageLayout',
-		text: 'Page Layout',
-		path: 'page-layouts',
-		icon: 'BackupTable',
-		subMenu: {
-			headerAndSubheader: {
-				id: 'headerAndSubheader',
-				text: 'Header & Subheader',
-				path: 'page-layouts/header-and-subheader',
-				icon: 'ViewAgenda',
-			},
-			onlyHeader: {
-				id: 'onlyHeader',
-				text: 'Only Header',
-				path: 'page-layouts/only-header',
-				icon: 'ViewStream',
-			},
-			onlySubheader: {
-				id: 'onlySubheader',
-				text: 'Only Subheader',
-				path: 'page-layouts/only-subheader',
-				icon: 'ViewStream',
-			},
-			onlyContent: {
-				id: 'onlyContent',
-				text: 'Only Content',
-				path: 'page-layouts/only-content',
-				icon: 'WebAsset',
-			},
-		},
-	},
-	asideTypes: {
-		id: 'asideTypes',
-		text: 'Aside Types',
-		path: 'aside-types',
-		icon: 'Vertical Split',
-		subMenu: {
-			defaultAside: {
-				id: 'defaultAside',
-				text: 'Default Aside',
-				path: 'aside-types/default-aside',
-				icon: 'ViewQuilt',
-			},
-			minimizeAside: {
-				id: 'minimizeAside',
-				text: 'Minimize Aside',
-				path: 'aside-types/minimize-aside',
-				icon: 'View Compact',
-			},
-		},
 	},
 };
 

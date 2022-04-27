@@ -3,12 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import Button from '../../../components/bootstrap/Button';
 import { HeaderRight } from '../../../layout/Header/Header';
-import OffCanvas, {
-	OffCanvasBody,
-	OffCanvasHeader,
-	OffCanvasTitle,
-} from '../../../components/bootstrap/OffCanvas';
-import Alert from '../../../components/bootstrap/Alert';
+
 import Dropdown, {
 	DropdownMenu,
 	DropdownToggle,
@@ -104,33 +99,7 @@ const CommonHeaderRight = ({ beforeChildren, afterChildren }) => {
 				{afterChildren}
 			</div>
 
-			<OffCanvas
-				id='notificationCanvas'
-				titleId='offcanvasExampleLabel'
-				placement='end'
-				isOpen={offcanvasStatus}
-				setOpen={setOffcanvasStatus}>
-				<OffCanvasHeader setOpen={setOffcanvasStatus}>
-					<OffCanvasTitle id='offcanvasExampleLabel'>Notifications</OffCanvasTitle>
-				</OffCanvasHeader>
-				<OffCanvasBody>
-					<Alert icon='ViewInAr' isLight color='info' className='flex-nowrap'>
-						4 new components added.
-					</Alert>
-					<Alert icon='ThumbUp' isLight color='warning' className='flex-nowrap'>
-						New products added to stock.
-					</Alert>
-					<Alert icon='Inventory2' isLight color='danger' className='flex-nowrap'>
-						There are products that need to be packaged.
-					</Alert>
-					<Alert icon='BakeryDining' isLight color='success' className='flex-nowrap'>
-						Your food order is waiting for you at the consultation.
-					</Alert>
-					<Alert icon='Escalator' isLight color='primary' className='flex-nowrap'>
-						Escalator will turn off at 6:00 pm.
-					</Alert>
-				</OffCanvasBody>
-			</OffCanvas>
+	
 		</HeaderRight>
 	);
 };

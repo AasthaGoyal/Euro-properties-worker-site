@@ -8,19 +8,13 @@ const LANDING = {
 const AUTH = {
 	PAGE_404: lazy(() => import('../pages/presentation/auth/Page404')),
 };
-const LIST = {
-	BOXED: lazy(() => import('../pages/presentation/users/ListBoxedPage')),
-	FLUID: lazy(() => import('../pages/presentation/users/ListFluidPage')),
+const USER = {
+	NEWUSER: lazy(() => import('../pages/presentation/users/AddNewUser')),
+	LISTUSERS: lazy(() => import('../pages/presentation/users/ListUsers')),	
+  PRODUCTS_VIEW: lazy(() => import('../pages/presentation/UserPages/ViewUser')),
 };
 
-const APP = {
-  SALES: {
-		TRANSACTIONS: lazy(() => import('../pages/presentation/sales/TransActionsPage')),
-		PRODUCTS: lazy(() => import('../pages/presentation/sales/SalesListPage')),
-		PRODUCTS_GRID: lazy(() => import('../pages/presentation/sales/ProductsGridPage')),
-		PRODUCTS_VIEW: lazy(() => import('../pages/presentation/sales/ProductViewPage')),
-	},
-}
+
 // const PAGE_LAYOUTS = {
 // 	HEADER_SUBHEADER: lazy(() => import('../pages/presentation/page-layouts/HeaderAndSubheader')),
 // 	HEADER: lazy(() => import('../pages/presentation/page-layouts/OnlyHeader')),
@@ -57,33 +51,19 @@ const presentation = [
 	},
   {
 		path: demoPages.UserPages.subMenu.listUsers.path,
-		element: <LIST.BOXED />,
+		element: <USER.LISTUSERS />,
 		exact: true,
 	},
 	{
 		path: demoPages.UserPages.subMenu.addUsers.path,
-		element: <LIST.FLUID />,
+		element: <USER.NEWUSER />,
 		exact: true,
 	},
 
+
 	{
-		path: demoPages.sales.subMenu.transactions.path,
-		element: <APP.SALES.TRANSACTIONS />,
-		exact: true,
-	},
-	{
-		path: demoPages.sales.subMenu.salesList.path,
-		element: <APP.SALES.PRODUCTS />,
-		exact: true,
-	},
-	{
-		path: demoPages.sales.subMenu.productsGrid.path,
-		element: <APP.SALES.PRODUCTS_GRID />,
-		exact: true,
-	},
-	{
-		path: `${demoPages.sales.subMenu.productID.path}/:id`,
-		element: <APP.SALES.PRODUCTS_VIEW />,
+		path: `${demoPages.UserPages.subMenu.editUser.path}/:id`,
+		element: <USER.PRODUCTS_VIEW />,
 		exact: true,
 	},
 

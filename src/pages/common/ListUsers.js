@@ -7,6 +7,7 @@ import { BASE_URL } from "../../actions/actionConstant";
 import classNames from 'classnames';
 import moment from 'moment';
 import { useFormik } from 'formik';
+import { demoPages } from '../../menu';
 import Card, {
   CardActions,
   CardBody,
@@ -40,6 +41,8 @@ import PaginationButtons, { dataPagination, PER_COUNT } from '../../components/P
 import useSortableData from '../../hooks/useSortableData';
 import useDarkMode from '../../hooks/useDarkMode';
 import UserData from './data/UserData';
+import _ from "lodash";
+import page from "../presentation/users/ListUsers";
 
 const ListUsers = (props) => {
 
@@ -50,32 +53,112 @@ const ListUsers = (props) => {
   // const [modal, setModal] = useState(false);
   // const [userId, setUserId] = useState("");
 
-  const [userdata, setUsers] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [modal, setModal] = useState(false);
+  const [userId, setUserId] = useState("");
   const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [usersPerPage] = useState(10);
+  const [perPage, setPerPage] = useState(PER_COUNT['5']);
 
   React.useEffect(() => {
     setLoading(true);
     axios.get(`http://localhost:5000/api/users`).then((response) => {
       setUsers(response.data);
-    
+
     });
     setLoading(false);
   }, []);
 
+  const openModal = (id) => {
+    // setUserId(id)
+    setModal(!modal);
+    setUserId(id);
+    console.log("User:", id);
+  };
 
-  // const { themeStatus, darkModeStatus } = useDarkMode();
-  const [currentPage, setCurrentPage] = useState(1);
-  const [perPage, setPerPage] = useState(PER_COUNT['5']);
-
-  const { users, requestSort, getClassNamesFor } = useSortableData(userdata);
-
-  console.log("sorted users", users);
-  const { jsonUsers } = JSON.stringify(users);
+  // // const { themeStatus, darkModeStatus } = useDarkMode();
+  // const [currentPage, setCurrentPage] = useState(1);
 
 
+  // const { users, requestSort, getClassNamesFor } = useSortableData(userdata);
+
+  // console.log("sorted users", users);
+  // const { jsonUsers } = JSON.stringify(users);
+
+  let userTable;
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
+
+  if (currentUsers.length === 0) {
+    userTable = (
+      <tr>
+        <td colSpan="8">No records</td>
+      </tr>
+    );
+  } else {
+    userTable = _.map(currentUsers, (user) => {
+      return (
+        <tr key={user._id}>
+          <td>{user.userType}</td>
+          <td>{user.username}</td>
+          <td>
+            {user.firstName} {user.lastName}
+          </td>
+          <td>{user.email}</td>
+          <td>{user.phone}</td>
+          <td>{user.note}</td>
+
+          <td>
+            <Dropdown>
+              <DropdownToggle hasIcon={false}>
+                <Button
+                  isLink
+                  color={user.status == "Active" ? "success" : "danger"}
+                  icon='Circle'
+                  className='text-nowrap'>
+                  {user.status}
+                </Button>
+              </DropdownToggle>
+              <DropdownMenu>
+                {Object.keys(EVENT_STATUS).map((key) => (
+                  <DropdownItem key={key}>
+                    <div>
+                      <Icon
+                        icon='Circle'
+                        color={EVENT_STATUS[key].color}
+                      />
+                      {EVENT_STATUS[key].name}
+                    </div>
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
+          </td>
+          <td>
+
+            <Button
+              isOutline={!darkModeStatus}
+              color='dark'
+              isLight={darkModeStatus}
+              className={classNames('text-nowrap', {
+                'border-light': !darkModeStatus,
+              })}
+              icon='Edit'
+              // onClick={openModal.bind(this, user._id)}
+              to={`../${demoPages.UserPages.subMenu.editUsers.path}/${user._id}`} >
+              Edit
+            </Button>
+
+          </td>
+
+        </tr>
+      );
+    });
+  }
 
   let userLoading;
-
   if (loading) {
     console.log("this is loading");
     userLoading = (
@@ -86,53 +169,54 @@ const ListUsers = (props) => {
       </tr>
     );
   } else {
-    console.log("loading is false", users, currentPage,perPage);
-    // userLoading = dataPagination(users, currentPage, perPage).map((user) => (
-    //   console.log(user.email)
-    // ))
+    userLoading = userTable;
   };
 
 
-return (
-  <Card >
-    <CardHeader borderSize={1}>
-      <CardLabel icon='Alarm' iconColor='warning'>
-        <CardTitle>Users</CardTitle>
-      </CardLabel>
-      <CardActions>
-        <Button
-          color='info'
-          icon='CloudDownload'
-          isLight
-          tag='a'
-          to='/somefile.txt'
-          target='_blank'
-          download>
-          Add New User
-        </Button>
-      </CardActions>
-    </CardHeader>
 
-    <CardBody className='table-responsive' >
+  return (
+    <Card >
+      <CardHeader borderSize={1}>
+        <CardLabel icon='Person' >
+        
+          <CardTitle>Users</CardTitle>
+      
+        </CardLabel>
+        <CardActions>
+          <Button
+            color='info'
+            icon='Add'
+            isLight
+            tag='a'
+            to={`../${demoPages.UserPages.subMenu.addUsers.path}`}
+            target='_blank'
+          >
+            Add New User
+          </Button>
+        </CardActions>
+      </CardHeader>
 
-      <table className='table table-modern'>
-        <thead>
-          <tr>
+      <CardBody className='table-responsive' >
 
-            <th>Role</th>
-            <th>Username</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Notes</th>
-            <th>Status</th>
-            <td />
-          </tr>
-        </thead>
-        <tbody>
+        <table className='table table-modern'>
+          <thead>
+            <tr>
 
-          
-          {/*<td>
+              <th>Role</th>
+              <th>Username</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Notes</th>
+              <th>Status</th>
+              <td />
+
+            </tr>
+          </thead>
+          <tbody>
+            {userLoading}
+
+            {/*<td>
                   <Button
                     isOutline={!darkModeStatus}
                     color='dark'
@@ -223,19 +307,19 @@ return (
                 </td>
               </tr>
             ))}  */}
-        </tbody>
-      </table>
-    </CardBody>
-    <PaginationButtons
-      data={users}
-      label='items'
-      setCurrentPage={setCurrentPage}
-      currentPage={currentPage}
-      perPage={perPage}
-      setPerPage={setPerPage}
-    />
-  </Card>
-)
+          </tbody>
+        </table>
+      </CardBody>
+      <PaginationButtons
+        data={users}
+        label='items'
+        setCurrentPage={setCurrentPage}
+        currentPage={currentPage}
+        perPage={perPage}
+        setPerPage={setPerPage}
+      />
+    </Card>
+  )
 
 }
 

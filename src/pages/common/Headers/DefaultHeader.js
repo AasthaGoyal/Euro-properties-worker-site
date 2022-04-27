@@ -4,19 +4,28 @@ import Navigation from '../../../layout/Navigation/Navigation';
 import { componentsMenu, layoutMenu } from '../../../menu';
 import useDeviceScreen from '../../../hooks/useDeviceScreen';
 import CommonHeaderRight from './CommonHeaderRight';
+import Search from '../../../components/Search';
+import SubHeader, {
+  SubHeaderLeft,
+  SubHeaderRight,
+  SubheaderSeparator,
+} from '../../../layout/SubHeader/SubHeader';
 
 const DefaultHeader = () => {
 	const deviceScreen = useDeviceScreen();
 	return (
 		<Header>
-			<HeaderLeft>
-				<Navigation
-					menu={{ ...layoutMenu, ...componentsMenu }}
-					id='header-top-menu'
-					horizontal={deviceScreen?.width >= process.env.REACT_APP_MOBILE_BREAKPOINT_SIZE}
-				/>
-			</HeaderLeft>
-			<CommonHeaderRight />
+       <SubHeader>
+        <SubHeaderLeft>
+          <span className='h4 mb-0 fw-bold'>Dashboard</span>
+          <SubheaderSeparator />
+
+        </SubHeaderLeft>
+        <SubHeaderRight>
+          Summary of all services
+        </SubHeaderRight>
+      </SubHeader>
+		
 		</Header>
 	);
 };

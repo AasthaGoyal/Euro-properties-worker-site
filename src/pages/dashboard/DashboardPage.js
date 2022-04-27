@@ -1,9 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
+import axios from "axios";
+import { BASE_URL } from "../../actions/actionConstant";
 import classNames from 'classnames';
 import { useTour } from '@reactour/tour';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
+import Icon from '../../components/icon/Icon';
+import { average, priceFormat } from '../../helpers/helpers';
 import SubHeader, {
   SubHeaderLeft,
   SubHeaderRight,
@@ -19,6 +23,7 @@ import Card, {
   CardSubTitle,
   CardTitle,
 } from '../../components/bootstrap/Card';
+import _ from "lodash";
 
 
 // import UserContact from '../../components/UserContact';
@@ -33,26 +38,74 @@ import useDarkMode from '../../hooks/useDarkMode';
 
 
 const DashboardPage = () => {
-  /**
-   * Tour Start
-   */
-  const { setIsOpen } = useTour();
+  const [employees, setEmployees] = useState([]);
+  const [jobsites, setJobsites] = useState([]);
+  const [invoices, setInvoices] = useState([]);
+  const [grossEarning, setGrossEarning] = useState(0);
+  const [profit, setProfit] = useState(0);
+  const [hoursWorked, setHoursWorked] = useState();
+
+
   useEffect(() => {
-    if (localStorage.getItem('tourModalStarted') !== 'shown') {
-      setTimeout(() => {
-        setIsOpen(true);
-        localStorage.setItem('tourModalStarted', 'shown');
-      }, 3000);
-    }
-    return () => { };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const fetchEmployees = async () => {
+      const res = await axios.get(`${BASE_URL}/api/employees`);
+      setEmployees(res.data);
+    };
+
+    fetchEmployees();
+
+    const fetchJobsites = async () => {
+      const res = await axios.get(`${BASE_URL}/api/jobsites`);
+      setJobsites(res.data);
+      let jobsites = res.data;
+      let grossEarning = _.sumBy(jobsites, 'workBudget');
+      setGrossEarning(grossEarning)
+
+      axios.get(`${BASE_URL}/api/employeeTimesheetFinal`).then((res) => {
+        let timesheet = res.data;
+        let hoursWorked = _.sumBy(timesheet, 'totalWorkHours');
+        setHoursWorked(hoursWorked);
+        let workedPayment = _.sumBy(timesheet, 'totalWorkerAmount')
+
+        axios.get(`${BASE_URL}/api/jobsitesmaterialpurchases`).then((res) => {
+          let material = res.data;
+
+          let totalMaterial = _.sumBy(material, 'totalCost');
+
+          let totalExtra = workedPayment + totalMaterial;
+
+          let profit = grossEarning - totalExtra;
+
+          setProfit(profit)
+
+        });
+
+      });
+
+
+
+
+    };
+
+    fetchJobsites();
+
+    const fetchInvoices = async () => {
+      const res = await axios.get(`${BASE_URL}/api/workerinvoices`);
+      setInvoices(res.data);
+    };
+
+    fetchInvoices();
+
+
   }, []);
+
+
 
   const { darkModeStatus } = useDarkMode();
 
   const navigate = useNavigate();
   const handleOnClickToEmployeeListPage = useCallback(
-    () => navigate(`../${demoPages.appointment.subMenu.employeeList.path}`),
+    () => navigate(`../${demoPages.UserPages.subMenu.listUsers.path}`),
     [navigate],
   );
 
@@ -186,7 +239,7 @@ const DashboardPage = () => {
 
 
   return (
-    <PageWrapper title={demoPages.sales.subMenu.dashboard.text}>
+    <PageWrapper title="Dashboard">
       <SubHeader>
         <SubHeaderLeft>
           <span className='h4 mb-0 fw-bold'>Dashboard</span>
@@ -194,7 +247,7 @@ const DashboardPage = () => {
 
         </SubHeaderLeft>
         <SubHeaderRight>
-          something can be added
+          Summary of all services
         </SubHeaderRight>
       </SubHeader>
       <Page container='fluid'>
@@ -233,12 +286,12 @@ const DashboardPage = () => {
             )}
               shadow='sm'>
               <CardHeader className='bg-transparent'>
-                <CardLabel>
+                <CardLabel icon='People' iconColor='danger'>
                   <CardTitle tag='h4' className='h5'>
                     Employees
                   </CardTitle>
                   <CardSubTitle tag='h5' className='h6 text-muted'>
-                    Number of current employees
+                    Number of current active/inactive employees
                   </CardSubTitle>
                 </CardLabel>
                 <CardActions>
@@ -252,7 +305,22 @@ const DashboardPage = () => {
                 </CardActions>
               </CardHeader>
               <CardBody>
-                23 (temp)
+
+                <div className='d-flex align-items-center pb-3'>
+
+                  <div className='flex-grow-1 ms-3'>
+                    <div className='fw-bold fs-3 mb-0'>
+                      {employees.length}
+                    </div>
+                    <div
+                      className={classNames({
+                        'text-muted': !darkModeStatus,
+                        'text-light': darkModeStatus,
+                      })}>
+                      total employees
+                    </div>
+                  </div>
+                </div>
                 {/* <AvatarGroup>
 									<Avatar
 										srcSet={USERS.GRACE.srcSet}
@@ -302,7 +370,7 @@ const DashboardPage = () => {
             )}
               shadow='sm'>
               <CardHeader className='bg-transparent'>
-                <CardLabel>
+                <CardLabel icon='Building' iconColor='info'>
                   <CardTitle tag='h4' className='h5'>
                     Jobsites
                   </CardTitle>
@@ -321,7 +389,21 @@ const DashboardPage = () => {
                 </CardActions>
               </CardHeader>
               <CardBody>
-                34(temp)
+                <div className='d-flex align-items-center pb-3'>
+
+                  <div className='flex-grow-1 ms-3'>
+                    <div className='fw-bold fs-3 mb-0'>
+                      {jobsites.length}
+                    </div>
+                    <div
+                      className={classNames({
+                        'text-muted': !darkModeStatus,
+                        'text-light': darkModeStatus,
+                      })}>
+                      total jobsites
+                    </div>
+                  </div>
+                </div>
               </CardBody>
             </Card>
           </div>
@@ -333,7 +415,7 @@ const DashboardPage = () => {
             )}
               shadow='sm'>
               <CardHeader className='bg-transparent'>
-                <CardLabel icon='PointOfSale' iconColor='success'>
+                <CardLabel icon='PointOfSale' iconColor='warning'>
                   <CardTitle tag='h4' className='h5'>
                     Invoices
                   </CardTitle>
@@ -352,7 +434,21 @@ const DashboardPage = () => {
                 </CardActions>
               </CardHeader>
               <CardBody>
-                34(temp)
+                <div className='d-flex align-items-center pb-3'>
+
+                  <div className='flex-grow-1 ms-3'>
+                    <div className='fw-bold fs-3 mb-0'>
+                      {invoices.length}
+                    </div>
+                    <div
+                      className={classNames({
+                        'text-muted': !darkModeStatus,
+                        'text-light': darkModeStatus,
+                      })}>
+                      total invoices
+                    </div>
+                  </div>
+                </div>
               </CardBody>
             </Card>
           </div>
@@ -367,13 +463,37 @@ const DashboardPage = () => {
               <CardHeader className='bg-transparent'>
                 <CardLabel icon='ReceiptLong'>
                   <CardTitle tag='h4' className='h5'>
-                    Gross Avenue
+                    Gross Revenue
                   </CardTitle>
+                  <CardSubTitle tag='h5' className='h6 text-muted'>
+                    Overall Gross revenue
+                  </CardSubTitle>
                 </CardLabel>
 
               </CardHeader>
               <CardBody>
-                $2000
+              <div className='d-flex align-items-center pb-3'>
+													<div className='flex-shrink-0'>
+														<Icon
+															icon='AttachMoney'
+															size='4x'
+															color='warning'
+														/>
+													</div>
+													<div className='flex-grow-1 ms-3'>
+														<div className='fw-bold fs-3 mb-0'>
+															{grossEarning}
+														
+														</div>
+														<div
+															className={classNames({
+																'text-muted': !darkModeStatus,
+																'text-light': darkModeStatus,
+															})}>
+														Total Gross Revenue
+														</div>
+													</div>
+												</div>
               </CardBody>
             </Card>
           </div>
@@ -385,15 +505,36 @@ const DashboardPage = () => {
               stretch
               shadow='sm'>
               <CardHeader className='bg-transparent'>
-                <CardLabel icon='NotificationsActive' iconColor='warning'>
+                <CardLabel icon='Stack' iconColor='danger'>
                   <CardTitle tag='h4' className='h5'>
                     Profit Revenue
                   </CardTitle>
-                  <CardSubTitle>Last Month 2021</CardSubTitle>
+                  <CardSubTitle>Until now</CardSubTitle>
                 </CardLabel>
               </CardHeader>
               <CardBody>
-                $3456
+              <div className='d-flex align-items-center pb-3'>
+													<div className='flex-shrink-0'>
+														<Icon
+															icon='AttachMoney'
+															size='4x'
+															color='warning'
+														/>
+													</div>
+													<div className='flex-grow-1 ms-3'>
+														<div className='fw-bold fs-3 mb-0'>
+															{profit}
+														
+														</div>
+														<div
+															className={classNames({
+																'text-muted': !darkModeStatus,
+																'text-light': darkModeStatus,
+															})}>
+													Total profit until now 
+														</div>
+													</div>
+												</div>
               </CardBody>
             </Card>
           </div>
@@ -405,15 +546,32 @@ const DashboardPage = () => {
               stretch
               shadow='sm'>
               <CardHeader className='bg-transparent'>
-                <CardLabel icon='AssignmentTurnedIn' iconColor='danger'>
+                <CardLabel icon='Hourglass' iconColor='success'>
                   <CardTitle tag='h4' className='h5'>
-                    Profit Revenue
+                    Total work hours
                   </CardTitle>
-                  <CardSubTitle>Last Month 2021</CardSubTitle>
+                  <CardSubTitle>Work done until now </CardSubTitle>
                 </CardLabel>
               </CardHeader>
               <CardBody>
-                $3456
+              <div className='d-flex align-items-center pb-3'>
+													<div className='flex-shrink-0'>
+													
+													</div>
+													<div className='flex-grow-1 ms-3'>
+														<div className='fw-bold fs-3 mb-0'>
+														{_.round(hoursWorked,2)}
+														
+														</div>
+														<div
+															className={classNames({
+																'text-muted': !darkModeStatus,
+																'text-light': darkModeStatus,
+															})}>
+													Total work done in hours 
+														</div>
+													</div>
+												</div>
               </CardBody>
             </Card>
           </div>

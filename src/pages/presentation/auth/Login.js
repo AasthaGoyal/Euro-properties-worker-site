@@ -10,7 +10,7 @@ import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../components/bootstrap/forms/Input';
 import Button from '../../../components/bootstrap/Button';
 import Logo from '../../../components/images/euro.jpg';
-import { loginUser } from "../../../actions/authActions";
+import { loginUser } from "./actions/authActions";
 
 
 class Login extends Component {
@@ -27,14 +27,15 @@ class Login extends Component {
   }
 
   componentDidMount() {
+    console.log(this.props);
     if (this.props.auth.isAuthenticated) {
-      this.props.history.push("/dashboard");
+      console.log("User is authenticated");
     }
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.auth.isAuthenticated) {
-      this.props.history.push("/dashboard");
+      console.log("User is authenticated");
     }
 
     if (nextProps.errors) {
@@ -49,6 +50,7 @@ class Login extends Component {
       username: this.state.username,
       password: this.state.password,
     };
+    console.log("user data is ", userData);
 
     this.props.loginUser(userData);
   };
@@ -119,7 +121,24 @@ class Login extends Component {
                       >
                         Login
                       </Button>
+                      <br/>
+                      <>
+											<div className='col-12 mt-3 text-center text-muted'>
+												OR
+											</div>
+											<div className='col-12 mt-3'>
+												<Button
+													
+													color='info'
+													className={classNames('w-100 py-3')}
+													icon='LockFill'
+											>
+													Forget Password
+												</Button>
+											</div>
+                      </>
 
+                       
                     </div>
 
                   </form>

@@ -5,15 +5,84 @@ import { useTranslation } from 'react-i18next';
 import Brand from '../Brand/Brand';
 import Navigation, { NavigationLine } from '../Navigation/Navigation';
 import User from '../User/User';
-import { dashboardMenu, demoPages } from '../../menu';
+import { componentsMenu, dashboardMenu, demoPages } from '../../menu';
 import ThemeContext from '../../contexts/themeContext';
+import Card, { CardBody } from '../../components/bootstrap/Card';
 
+import Hand from '../../assets/img/hand.png';
+import HandWebp from '../../assets/img/hand.webp';
 import Icon from '../../components/icon/Icon';
+import Button from '../../components/bootstrap/Button';
 import Tooltips from '../../components/bootstrap/Tooltips';
+import useDarkMode from '../../hooks/useDarkMode';
 import useAsideTouch from '../../hooks/useAsideTouch';
-import Popovers from '../../components/bootstrap/Popovers';
 
 const Aside = () => {
+  const layoutMenu = {
+    layoutTypes: {
+      id: 'layoutTypes',
+      text: 'Page Layout Types',
+    },
+    blank: {
+      id: 'blank',
+      text: 'Blank',
+      path: 'page-layouts/blank',
+      icon: 'check_box_outline_blank ',
+    },
+    pageLayout: {
+      id: 'pageLayout',
+      text: 'Page Layout',
+      path: 'page-layouts',
+      icon: 'BackupTable',
+      subMenu: {
+        headerAndSubheader: {
+          id: 'headerAndSubheader',
+          text: 'Header & Subheader',
+          path: 'page-layouts/header-and-subheader',
+          icon: 'ViewAgenda',
+        },
+        onlyHeader: {
+          id: 'onlyHeader',
+          text: 'Only Header',
+          path: 'page-layouts/only-header',
+          icon: 'ViewStream',
+        },
+        onlySubheader: {
+          id: 'onlySubheader',
+          text: 'Only Subheader',
+          path: 'page-layouts/only-subheader',
+          icon: 'ViewStream',
+        },
+        onlyContent: {
+          id: 'onlyContent',
+          text: 'Only Content',
+          path: 'page-layouts/only-content',
+          icon: 'WebAsset',
+        },
+      },
+    },
+    asideTypes: {
+      id: 'asideTypes',
+      text: 'Aside Types',
+      path: 'aside-types',
+      icon: 'Vertical Split',
+      subMenu: {
+        defaultAside: {
+          id: 'defaultAside',
+          text: 'Default Aside',
+          path: 'aside-types/default-aside',
+          icon: 'ViewQuilt',
+        },
+        minimizeAside: {
+          id: 'minimizeAside',
+          text: 'Minimize Aside',
+          path: 'aside-types/minimize-aside',
+          icon: 'View Compact',
+        },
+      },
+    },
+  };
+
 	const { asideStatus, setAsideStatus } = useContext(ThemeContext);
 
 	const { asideStyle, touchStatus, hasTouchButton, asideWidthWithSpace, x } = useAsideTouch();
@@ -25,6 +94,12 @@ const Aside = () => {
 	const [doc, setDoc] = useState(false);
 
 	const { t } = useTranslation(['translation', 'menu']);
+
+	const { darkModeStatus } = useDarkMode();
+  
+  // const layoutMenu = {layoutTypes: {…}, blank: {…}, pageLayout: {…}, asideTypes: {…}}
+
+  
 
 	return (
 		<>
@@ -44,37 +119,50 @@ const Aside = () => {
 				</div>
 				<div className='aside-body'>
 					<Navigation menu={dashboardMenu} id='aside-dashboard' />
-					<NavigationLine />
 					{!doc && (
 						<>
+							<NavigationLine />
 							<Navigation menu={demoPages} id='aside-demo-pages' />
 							<NavigationLine />
-				
-	
-							<nav>
-								<div className='navigation'>
-									<div className='navigation-item'>
-										<span className='navigation-link navigation-link-pill'>
-											<span className='navigation-link-info'>
-												<span className='navigation-text'>
-													<Popovers
-														title='Aside.js'
-														desc={
-															<code>src/layout/Aside/Aside.js</code>
-														}>
-														Aside
-													</Popovers>
-													<code className='ps-3'>Aside.js</code>
-												</span>
-											</span>
-										</span>
-									</div>
-								</div>
-							</nav>
+							<Navigation menu={layoutMenu} id='aside-menu' />
 						</>
 					)}
 
-					{asideStatus && doc && <div className='p-4'>Documentation</div>}
+					{doc && (
+						<>
+							<NavigationLine />
+							<Navigation menu={componentsMenu} id='aside-menu-two' />
+							<NavigationLine />
+						</>
+					)}
+
+					{asideStatus && doc && (
+						<Card className='m-3 '>
+							<CardBody className='pt-0'>
+								<img
+									srcSet={HandWebp}
+									src={Hand}
+									alt='Hand'
+									width={130}
+									height={130}
+								/>
+								<p
+									className={classNames('h4', {
+										'text-dark': !darkModeStatus,
+										'text-light': darkModeStatus,
+									})}>
+									{t('Everything is ready!')}
+								</p>
+								<Button
+									color='info'
+									isLight
+									className='w-100'
+									onClick={() => setDoc(false)}>
+									{t('Demo Pages')}
+								</Button>
+							</CardBody>
+						</Card>
+					)}
 				</div>
 				<div className='aside-foot'>
 					<nav aria-label='aside-bottom-menu'>

@@ -6,7 +6,7 @@ import Icon from '../../../components/icon/Icon';
 import Button from '../../../components/bootstrap/Button';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
-import ListUsers from '../../common/ListUsers';
+import ListAllUsers from '../UserPages/ListAllUsers';
 
 import { demoPages } from '../../../menu';
 
@@ -46,7 +46,7 @@ const ListFluidPage = () => {
 				</SubHeaderRight>
 			</SubHeader> */}
 			<Page container='fluid'>
-				<ListUsers />
+				<ListAllUsers />
 			</Page>
 		</PageWrapper>
 	);
