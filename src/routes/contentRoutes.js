@@ -9,11 +9,22 @@ const AUTH = {
 	PAGE_404: lazy(() => import('../pages/presentation/auth/Page404')),
 };
 const USER = {
-	NEWUSER: lazy(() => import('../pages/presentation/users/AddNewUser')),
-	LISTUSERS: lazy(() => import('../pages/presentation/users/ListUsers')),	
+	NEWUSER: lazy(() => import('../pages/presentation/UserPages/AddNewUser')),
+	LISTUSERS: lazy(() => import('../pages/presentation/UserPages/ListAllUsers')),	
   PRODUCTS_VIEW: lazy(() => import('../pages/presentation/UserPages/ViewUser')),
 };
 
+const JOBSITE = {
+  NEWJOBSITE: lazy(() => import('../pages/presentation/Jobsites/AddNewJobsite')),
+	LISTJOBSITES: lazy(() => import('../pages/presentation/Jobsites/ListAllJobsites')),	
+  EDITJOBSITE: lazy(() => import('../pages/presentation/Jobsites/ViewJobsites')),
+}
+
+const TASKS = {
+  NEWTASK: lazy(() => import('../pages/presentation/Tasks/AddNewTask')),
+	LISTTASK: lazy(() => import('../pages/presentation/Tasks/ListAllTasks')),	
+  EDITTASK: lazy(() => import('../pages/presentation/Tasks/EditTasks')),
+}
 
 // const PAGE_LAYOUTS = {
 // 	HEADER_SUBHEADER: lazy(() => import('../pages/presentation/page-layouts/HeaderAndSubheader')),
@@ -66,6 +77,38 @@ const presentation = [
 		element: <USER.PRODUCTS_VIEW />,
 		exact: true,
 	},
+  {
+		path: demoPages.Jobsites.subMenu.addJobsite.path,
+		element: <JOBSITE.NEWJOBSITE />,
+		exact: true,
+	},
+  {
+		path: demoPages.Jobsites.subMenu.viewJobsite.path,
+		element: <JOBSITE.LISTJOBSITES />,
+		exact: true,
+	},
+  {
+		path: `${demoPages.Jobsites.subMenu.editJobsite.path}/:id`,
+		element: <JOBSITE.EDITJOBSITE />,
+		exact: true,
+	},
+  {
+		path: demoPages.Tasks.subMenu.addTasks.path,
+		element: <TASKS.NEWTASK />,
+		exact: true,
+	},
+  {
+		path: demoPages.Tasks.subMenu.viewTasks.path,
+		element: <TASKS.LISTTASK />,
+		exact: true,
+	},
+  {
+		path: `${demoPages.Tasks.subMenu.editTasks.path}/:id`,
+		element: <TASKS.EDITTASK />,
+		exact: true,
+	},
+
+
 
 ];
 const contents = [...presentation];

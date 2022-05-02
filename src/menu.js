@@ -59,14 +59,13 @@ export const demoPages = {
 				icon: 'AddCircle',
 			},
 			listUsers: {
-				id: 'listUsers',
+				id: 'viewUsers',
 				text: 'View Users',
 				path: 'user-pages/viewUsers',
 				icon: 'EmojiPeople',
 			},
       editUser: {
 				id: 'editUsers',
-        visibility: false,
 				text: 'Edit Users',
 				path: 'user-pages/editUsers',
 				icon: 'EmojiPeople',
@@ -75,31 +74,59 @@ export const demoPages = {
   
 		},
 	},
-	listPages: {
-		id: 'listPages',
+	Jobsites: {
+		id: 'jobsites',
 		text: 'Job sites',
-		path: 'list-pages',
+		path: 'job-sites',
 		icon: 'Business',
 		subMenu: {
-			listBoxed: {
-				id: 'listBoxed',
+			addJobsite: {
+				id: 'addJobsites',
 				text: 'Add Jobsite',
-				path: 'list-pages/boxed-list',
+				path: 'job-sites/AddNewJobsite',
 				icon: 'AddBox',
 			},
-			listFluid: {
-				id: 'listFluid',
-				text: 'Assign Jobsite',
-				path: 'list-pages/fluid-list',
+			viewJobsite: {
+				id: 'viewJobsites',
+				text: 'View Jobsite',
+				path: 'job-sites/ListAllJobsites',
 				icon: 'Build',
 			},
+      editJobsite: {
+        id: 'editJobsites',
+				text: 'Edit Jobsite',
+				path: 'job-sites/editJobsite',
+				icon: 'Build',
+      }
+      
 		},
 	},
-	gridPages: {
-		id: 'gridPages',
+	Tasks: {
+		id: 'tasks',
 		text: 'Tasks',
-		path: 'grid-pages',
-		icon: 'Task'
+		path: 'task-pages',
+		icon: 'Task',
+    subMenu: {
+			addTasks: {
+				id: 'addTasks',
+				text: 'Add Task',
+				path: 'task-pages/AddNewTask',
+				icon: 'Tools',
+			},
+			viewTasks: {
+				id: 'viewTasks',
+				text: 'View Task',
+				path: 'task-pages/ListAllTasks',
+				icon: 'CheckAll',
+			},
+      editTasks: {
+        id: 'editTasks',
+				text: 'Edit Task',
+				path: 'task-pages/EditTasks',
+				icon: 'Task',
+      }
+      
+		},
 	},
   invoices: {
 		id: 'invoices',
