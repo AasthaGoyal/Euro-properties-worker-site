@@ -134,31 +134,57 @@ export const demoPages = {
 		path: 'grid-pages',
 		icon: 'PointOfSale'
 	},
-	editPages: {
-		id: 'editPages',
+	Vehicle: {
+		id: 'vehicle',
 		text: 'Vehicles',
-		path: 'edit-pages',
+		path: 'vehicle-pages',
 		icon: 'Train ',
 		subMenu: {
-			editBoxed: {
-				id: 'editBoxed',
+			addVehicle: {
+				id: 'addVehicle',
 				text: 'Add Vehicle',
-				path: 'edit-pages/boxed',
+				path: 'vehicle-pages/addVehicle',
 				icon: 'AddLocation',
 			},
-			editFluid: {
-				id: 'editFluid',
-				text: 'View/Assign Vehicle',
-				path: 'edit-pages/fluid',
+			viewVehicle: {
+				id: 'viewVehicle',
+				text: 'View Vehicle',
+				path: 'vehicle-pages/viewVehicle',
 				icon: 'TaxiAlert',
 			},
+      editVehicle: {
+        id: 'editVehicle',
+				text: 'Edit Vehicle',
+				path: 'vehicle-pages/editVehicle',
+				icon: 'TaxiAlert',
+      }
 		},
 	},
-	pricingTable: {
-		id: 'pricingTable',
+	Material: {
+		id: 'material',
 		text: 'Materials',
-		path: 'pricing-table',
+		path: 'material-pages',
 		icon: 'Palette',
+		subMenu: {
+			addMaterial: {
+				id: 'addMaterial',
+				text: 'Add Material',
+				path: 'material-pages/addMaterial',
+				icon: 'PaintBucket',
+			},
+			viewMaterial: {
+				id: 'viewMaterial',
+				text: 'View Material',
+				path: 'material-pages/viewMaterial',
+				icon: 'BrushFill',
+			},
+      editMaterial: {
+        id: 'editMaterial',
+				text: 'Edit Material',
+				path: 'material-pages/editMaterial',
+				icon: 'BrushFill',
+      }
+		},
 	},
   reports: {
 		id: 'reports',
@@ -701,9 +727,4 @@ export const componentsMenu = {
 	},
 };
 
-export const productsMenu = {
-	companyA: { id: 'companyA', text: 'Company A', path: 'grid-pages/products', subMenu: null },
-	companyB: { id: 'companyB', text: 'Company B', path: '/', subMenu: null },
-	companyC: { id: 'companyC', text: 'Company C', path: '/', subMenu: null },
-	companyD: { id: 'companyD', text: 'Company D', path: '/', subMenu: null },
-};
+

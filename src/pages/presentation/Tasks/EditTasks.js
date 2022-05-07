@@ -73,11 +73,8 @@ const ProductViewPage = () => {
   const [jobsiteName, setJobsiteName] = useState();
   const [jobsite, setJobsite] = useState();
   const [notes, setNotes] = useState();
-
-  const [jobs, setInitialJobs] = useState([]);
-  const [workers, setInitialWorkers] = useState([]);
-
-
+  const [jobsiteId, setJobsiteId] = useState();
+  const [workersId, setWorkersId] = useState([]);
 
 
   const onChangeTaskTitle = (e) => {
@@ -122,23 +119,130 @@ const ProductViewPage = () => {
 
 
   useEffect(() => {
-  
+
+    axios.get(`${BASE_URL}/api/jobsites`).then((res) => {
+      setJobsites(res.data);
+    });
+
+
+    axios.get(`${BASE_URL}/api/users`).then((res) => {
+      setUsers(res.data);
+    });
+
     axios
       .get(`${BASE_URL}/api/tasks/${id}`)
       .then((res) => {
-        console.log(res.data);
-        // setTaskTitle(res.data.taskTitle);
-        // setTaskDescription(res.data.taskDescription);
-        // setStartDate(res.data.startDate);
-        // setEndDate(res.data.endDate);
-        // setInitialJobs(res.data.jobsite);
-        // setInitialWorkers(res.data.workersAssign);
+        console.log("the response is", res.data);
+        setTaskTitle(res.data.taskTitle);
+        setTaskDescription(res.data.taskDescription);
+
+
+        res.data.startDate && setStartDate(new Date(res.data.startDate));
+        res.data.endDate && setEndDate(new Date(res.data.endDate));
+
+        setJobsiteId(res.data.jobsite);
+        setWorkersId(res.data.workersAssign);
+
 
 
       });
   }, []);
 
+  let jobs = [];
 
+  _.map(jobsites, (job) => {
+    jobs.push(job.address);
+  });
+
+  let workers = [];
+  _.map(users, (user) => {
+    let userObject = _.filter(users, ["_id", user._id]);
+    if (userObject.length === 0) {
+
+    } else {
+      workers.push(userObject[0].username);
+    }
+  });
+
+
+  let demo = '';
+  
+  _.map(jobsites, (job) => {
+    if (job._id == jobsiteId) {
+      console.log(job.address);
+      demo = job.address;
+    }
+  });
+
+let finalusers = [];
+  workersId.map((wrk) => {
+    _.map(users, (user) => {
+      if (user._id == wrk) {
+        console.log("matching ", user._id, "name", user.username, "work", wrk);
+        finalusers.push(user.username);
+      }
+    })
+  });
+
+  console.log("final users", finalusers);
+
+  const deleteTask = () => {
+
+    axios.delete(`${BASE_URL}/api/tasks/${id}`).then((response) => {
+      axios.get(`${BASE_URL}/api/tasks/`).then((response) => {
+        console.log(response.data);
+        showNotification(
+          <span className='d-flex align-items-center'>
+            <Icon icon='Info' size='lg' className='me-1' />
+            <span>Task Deleted Successfully</span>
+          </span>,
+          "The Task has been deleted successfully.",
+        );
+    
+      });
+      setModal(!modal);
+    });
+
+    //setSucess(true);
+    setTimeout(() => {
+      // setSucess(false);
+    }, 3000);
+  };
+
+  const onEditSubmit = (e) =>
+  {
+    e.preventDefault();
+
+    const taskObject = {
+      jobsite,
+      taskTitle,
+      taskDescription,
+      startDate,
+      endDate,
+      workersAssign,
+      status: "Pending",
+    };
+
+    console.log("the task to be updated is", taskObject);
+    axios
+    .put(`${BASE_URL}/api/tasks/edit/${id}`, taskObject)
+    .then((res) => {
+      if(res.status == 200)
+      {
+        showNotification(
+          <span className='d-flex align-items-center'>
+            <Icon icon='Info' size='lg' className='me-1' />
+            <span>Task Updated Successfully</span>
+          </span>,
+          "The Task has been updated successfully.",
+        );
+      }
+    });
+
+
+  }
+
+console.log("Worker Assigns:", workersAssign);
 
   return (
     <PageWrapper title="Edit User">
@@ -149,7 +253,7 @@ const ProductViewPage = () => {
           <Button
             color="primary"
             className="btn-theme btn-sm"
-
+            onClick={deleteTask}
           >
             Yes Delete
           </Button>{" "}
@@ -170,7 +274,7 @@ const ProductViewPage = () => {
           <SubheaderSeparator />
 
           <span>
-            <strong>some thibng</strong>
+            <strong>{taskTitle}</strong>
           </span>
           <span className='text-muted'>Edit Task</span>
         </SubHeaderLeft>
@@ -242,8 +346,18 @@ const ProductViewPage = () => {
                   <div className='row g-4'>
                     <div className='col-lg-12'>
 
-                      <label>Select Jobsite</label>
 
+                      <FormGroup
+                        className='col-lg-12'
+                        id='jobsitename'
+                        label='Jobsite Address *'>
+                        <Input
+                          type="text"
+                          className="form-control"
+                          value={demo}
+                        />
+                      </FormGroup>
+                      <br/>
                       <Picky
                         id="picky1"
                         options={jobs}
@@ -264,9 +378,20 @@ const ProductViewPage = () => {
                         dropdownHeight={600}
                       />
 
+
                     </div>
                     <div className='col-lg-12'>
-                      <label> Worker(s): </label>
+                    <FormGroup
+                        className='col-lg-12'
+                        id='workers'
+                        label='Workers *'>
+                        <Input
+                          type="text"
+                          className="form-control"
+                          value={finalusers}
+                        />
+                      </FormGroup>
+                      <br/>
                       <Picky
                         id="picky2"
                         placeholder="Worker(s) *"
@@ -278,18 +403,22 @@ const ProductViewPage = () => {
                         onChange={(worker) => {
                           setWorkersList(worker)
                           console.log('Worker:', worker)
-
+  
                           let workerSelected = _.uniq(worker);
-
+  
                           let findUsers = [];
-
+  
                           _.map(workerSelected, (user) => {
                             let currentUser = _.filter(users, [
                               "username",
                               user,
                             ]);
                             findUsers.push(currentUser[0]._id);
-                          });
+                          })
+  
+                          let workerAssigns = _.uniq(findUsers);
+  
+                          setWorkersAssign(workerAssigns)
                         }}
                         dropdownHeight={600}
                       />
@@ -306,6 +435,7 @@ const ProductViewPage = () => {
                           name="taskTitle"
                           className="form-control"
                           onChange={onChangeTaskTitle}
+                          value={taskTitle}
 
                         />
                       </FormGroup>
@@ -324,23 +454,24 @@ const ProductViewPage = () => {
                           name="taskDescription"
                           className="form-control"
                           onChange={onChangeTaskDescription}
+                          value={taskDescription}
                         />
                       </FormGroup>
                     </div>
                     <div className='col-md-6'>
-                      <FormGroup className='col-lg-6'>
+                      <FormGroup >
                         <label>Start Date</label>
                         <DatePicker
                           selected={startDate}
                           onChange={(date) => setStartDate(date)}
-                          className="form-control col-md-6"
+                          className="form-control"
                           placeholder="Start Date"
                         />
                       </FormGroup>
                     </div>
                     <div className='col-md-6'>
 
-                      <FormGroup className='col-lg-6'>
+                      <FormGroup >
                         <label>End Date</label>
                         <DatePicker
                           selected={endDate}
@@ -377,6 +508,7 @@ const ProductViewPage = () => {
                       type='submit'
                       icon='Save'
                       color='info'
+                      onClick={onEditSubmit}
                     >
                       Submit
                     </Button>

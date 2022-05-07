@@ -87,7 +87,7 @@ const AddNewUser = () => {
       taskDescription,
       startDate,
       endDate,
-      workersList,
+      workersAssign,
       status: "Pending",
       note: notes
     };
@@ -145,6 +145,8 @@ const AddNewUser = () => {
       setUsers(res.data);
     });
   }, []);
+
+  console.log("Worker Assigns:", workersAssign);
 
   return (
     <PageWrapper title="Add New User">
@@ -233,7 +235,11 @@ const AddNewUser = () => {
                             user,
                           ]);
                           findUsers.push(currentUser[0]._id);
-                        });
+                        })
+
+                        let workerAssigns = _.uniq(findUsers);
+
+                        setWorkersAssign(workerAssigns)
                       }}
                       dropdownHeight={600}
                     />

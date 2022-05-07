@@ -50,6 +50,7 @@ import "react-datepicker/dist/react-datepicker.css";
 
 
 
+
 const ProductViewPage = () => {
   const { darkModeStatus } = useDarkMode();
   const [status] = useState('Active');
@@ -61,6 +62,8 @@ const ProductViewPage = () => {
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
   const [redirect, setRedirect] = useState(false);
+  const [workersAssign, setWorkersAssign] = useState([]);
+  const [workersId, setWorkersId] = useState([]);
 
   const validateJobsite = (values) => {
     const errors = {};
@@ -189,18 +192,7 @@ const ProductViewPage = () => {
     },
   });
 
-  const formikAssign = useFormik({
-    initialValues: {
-      jobsiteName: [],
-      workers: [],
-      startDate: '',
-      endDate: ''
-    },
-    validate: validateAssign,
-    onSubmit: () => {
-      console.log("assign subitted");
-    },
-  });
+
 
   const formikJobsite = useFormik({
     initialValues: {
@@ -256,6 +248,8 @@ const ProductViewPage = () => {
     e.preventDefault();
 
     let values = [];
+
+
     const jobsiteObject = {
       address: values.jobsiteAddress,
       ownerName: values.ownerName,
@@ -267,25 +261,35 @@ const ProductViewPage = () => {
       workBudget: values.workBudget,
       note: values.note,
       stageOfWork: values.stageWork,
-      workersList: workersList,
+      workersList: workersAssign,
+      startDate: startDate,
+      endDate: endDate
     };
 
 
 
     console.log("jobsiteObject:", jobsiteObject)
     axios
-      .post(`${BASE_URL}/api/jobsites/edit/${id}`, jobsiteObject)
+      .put(`${BASE_URL}/api/jobsites/edit/${id}`, jobsiteObject)
       .then((res) => {
-        console.log("assign res is", res.data);
-
+        if(res.status == 200)
+        {
+          showNotification(
+            <span className='d-flex align-items-center'>
+              <Icon icon='Info' size='lg' className='me-1' />
+              <span>Jobsite Updated Successfully</span>
+            </span>,
+            "The Jobsite has been updated successfully.",
+          );
+        }
       });
-    showNotification(
-      <span className='d-flex align-items-center'>
-        <Icon icon='Success' size='lg' className='me-1' />
-        <span>Jobsite assigned to workers</span>
-      </span>,
-      "The Jobsite has been assigned successfully.",
-    );
+    // showNotification(
+    //   <span className='d-flex align-items-center'>
+    //     <Icon icon='Success' size='lg' className='me-1' />
+    //     <span>Jobsite assigned to workers</span>
+    //   </span>,
+    //   "The Jobsite has been assigned successfully.",
+    // );
 
   }
 
@@ -338,12 +342,17 @@ const ProductViewPage = () => {
           longitude: res.data.longitude,
           latitude: res.data.latitude
         });
+        res.data.startDate && setStartDate(new Date(res.data.startDate));
+        res.data.endDate && setEndDate(new Date(res.data.endDate));
+
+        res.data.workersList && setWorkersId(res.data.workersList);
 
       });
 
     axios.get(`${BASE_URL}/api/users`).then((res) => {
       setUsers(res.data);
     });
+
 
 
   }, []);
@@ -359,13 +368,23 @@ const ProductViewPage = () => {
     }
   });
 
+  let finalusers = [];
+  workersId && workersId.map((wrk) => {
+    _.map(users, (user) => {
+      if (user._id == wrk) {
+        console.log("matching ", user._id, "name", user.username, "work", wrk);
+        finalusers.push(user.username);
+      }
+    })
+  });
+
+
 
   const openModal = () => {
     // setUserId(id)
     setModal(!modal);
 
   };
-
 
   return (
     <PageWrapper title="Edit Jobsites">
@@ -773,37 +792,50 @@ const ProductViewPage = () => {
                   <div className='row g-4'>
                     <div className='col-lg-12'>
 
-                      <label> Worker(s): </label>
-                      <Picky
-                        id="picky2"
-                        placeholder="Worker(s) *"
-                        options={workers}
-                        value={workersList}
-                        multiple={true}
-                        includeSelectAll={true}
-                        includeFilter={true}
-                        onChange={(worker) => {
-                          setWorkersList(worker)
-                          console.log('Worker:', worker)
+                      <FormGroup  label='Worker(s) *'>
+                        <Input
 
-                          let workerSelected = _.uniq(worker);
+                          value={finalusers}
 
-                          let findUsers = [];
+                        />
+                        <br />
+                        <Picky
+                          id="picky2"
+                          placeholder="Worker(s) *"
+                          options={workers}
+                          value={workersList}
+                          multiple={true}
+                          includeSelectAll={true}
+                          includeFilter={true}
+                          onChange={(worker) => {
+                            setWorkersList(worker)
+                            console.log('Worker:', worker)
 
-                          _.map(workerSelected, (user) => {
-                            let currentUser = _.filter(users, [
-                              "username",
-                              user,
-                            ]);
-                            findUsers.push(currentUser[0]._id);
-                          });
-                        }}
-                        dropdownHeight={600}
-                      />
+                            let workerSelected = _.uniq(worker);
+
+                            let findUsers = [];
+
+                            _.map(workerSelected, (user) => {
+                              let currentUser = _.filter(users, [
+                                "username",
+                                user,
+                              ]);
+                              findUsers.push(currentUser[0]._id);
+                            })
+
+                            let workerAssigns = _.uniq(findUsers);
+
+                            setWorkersAssign(workerAssigns)
+                          }}
+                          dropdownHeight={600}
+                        />
+                      </FormGroup>
 
                     </div>
                     <div className='col-lg-12'>
-                      <label> Start Date *: </label>
+
+                      <label> Start Date * : </label>
+
                       <DatePicker
                         placeholder="Start Date *"
                         selected={startDate}

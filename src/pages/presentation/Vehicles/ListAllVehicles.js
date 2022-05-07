@@ -32,42 +32,33 @@ import axios from "axios";
 import { BASE_URL } from "../../../actions/actionConstant";
 import PaginationButtons, { dataPagination, PER_COUNT } from '../../../components/PaginationButtons';
 import useDarkMode from '../../../hooks/useDarkMode';
-import EVENT_STATUS from '../../common/data/enumEventStatus';
+import EVENT_STATUS from '../../common/data/enumEventTasks';
 import Input from '../../../components/bootstrap/forms/Input';
 import { useFormik } from 'formik';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Label from '../../../components/bootstrap/forms/Label';
 import Select from '../../../components/bootstrap/forms/Select';
 import CommonFilterTag from '../../common/CommonFilterTag';
+import Moment from "react-moment";
 
-const ListAllJobsites = () => {
+const ListAllVehicles = () => {
   const { themeStatus, darkModeStatus } = useDarkMode();
 
-  // const { isAuthenticated, user } = props.auth;
-
-  // const [modal, setModal] = useState(false);
-  // const [userId, setUserId] = useState("");
-
-  const [jobsites, setJobsites] = useState([]);
+  const [vehicles, setVehicles] = useState([]);
 
   const [modal, setModal] = useState(false);
-  const [jobsiteId, setJobsiteId] = useState("");
+  const [vehicleId, setVehicleId] = useState("");
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [jobsitesPerPage] = useState(10);
+  const [vehiclesPerPage] = useState(10);
   const [perPage, setPerPage] = useState(PER_COUNT['5']);
   const [status, setStatus] = useState("All");
   const [assigned, setAssigned] = useState("All");
-  const [assignedJobsites, setAssignedJobsites] = useState([]);
   const [users, setUsers] = useState([]);
 
   React.useEffect(() => {
     setLoading(true);
-    axios.get(`${BASE_URL}/api/jobsites`).then((response) => {
-      setJobsites(response.data);
-
-    });
-
+    axios.get(`${BASE_URL}/api/vehicles`).then(res => setVehicles(res.data));
 
     axios.get(`${BASE_URL}/api/users`).then((res) => {
       setUsers(res.data);
@@ -78,49 +69,75 @@ const ListAllJobsites = () => {
   }, []);
 
   const openModal = (id) => {
-    // setJobsiteId(id)
+    // setVehicleId(id)
     setModal(!modal);
-    setJobsiteId(id);
-    console.log("Jobsite:", id);
+    setVehicleId(id);
+    console.log("Vehicle:", id);
   };
 
   const changeStatus = (e) => {
     e.preventDefault();
     console.log("value changed", e.target.value);
   }
-  // // const { themeStatus, darkModeStatus } = useDarkMode();
-  // const [currentPage, setCurrentPage] = useState(1);
+
+  const searchbyStatus = (e) => {
+    setStatus(e.target.value);
+    axios.get(`${BASE_URL}/api/vehicles`).then((res) => {
+
+      let status = e.target.value;
+      let vehicleData = res.data;
+
+      console.log("vehicle data", vehicleData);
+
+      if (status === 'All') {
+        setVehicles(vehicleData);
+      } else {
+        var vehicleResult = _.filter(vehicleData, ['status', status]);
+
+        setVehicles(vehicleResult);
+      }
+    });
+  }
+
+  const searchByAssigned = (e) => {
+    setAssigned(e.target.value);
+
+    axios.get(`${BASE_URL}/api/vehicles`).then((res) => {
+
+      let assignedValue = e.target.value;
+      let vehicleData = res.data;
+
+      if (assignedValue === 'All') {
+        setVehicles(vehicleData);
+      }
+
+    });
+
+  }
+
+  let vehicleTable;
+
+  // Get current posts
+  const indexOfLastVehicle = currentPage * vehiclesPerPage;
+  const indexOfFirstVehicle = indexOfLastVehicle - vehiclesPerPage;
+  const currentVehicles = vehicles.slice(indexOfFirstVehicle, indexOfLastVehicle);
+
+  // Change page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
 
-  // const { users, requestSort, getClassNamesFor } = useSortableData(userdata);
-
-  // console.log("sorted users", users);
-  // const { jsonUsers } = JSON.stringify(users);
-
-  let jobsiteTable;
-  const indexOfLastJobsite = currentPage * jobsitesPerPage;
-  const indexOfFirstJobsite = indexOfLastJobsite - jobsitesPerPage;
-  const currentJobsites = jobsites.slice(
-    indexOfFirstJobsite,
-    indexOfLastJobsite
-  );
-
-  if (currentJobsites.length === 0) {
-    jobsiteTable = (
+  if (currentVehicles.length === 0) {
+    vehicleTable = (
       <tr>
-        <td colSpan="11">No records</td>
+        <td colSpan="7">No records</td>
       </tr>
     );
   } else {
-
-    console.log("current filtered set", currentJobsites);
-
-    jobsiteTable = _.map(currentJobsites, (jobsite) => {
-
+    vehicleTable = _.map(currentVehicles, (vehicle) => {
       let finalusers = [];
 
 
-      jobsite.workersList && jobsite.workersList.map((wrk) => {
+      vehicle.workersList && vehicle.workersList.map((wrk) => {
         _.map(users, (user) => {
           if (user._id == wrk) {
 
@@ -130,37 +147,31 @@ const ListAllJobsites = () => {
       });
 
 
-
-      // let users = _.filter(users, ['_id', jobsite.user]);
-
       return (
-
-
-        <tr key={jobsite._id}>
-
+        <tr key={vehicle._id}>
           <td>
-            <Link to={`../${demoPages.Jobsites.subMenu.editJobsite.path}/${jobsite._id}`}>
-              {jobsite.ownerName}
+            <Link to={`../${demoPages.Vehicle.subMenu.editVehicle.path}/${vehicle._id}`}>
+              {vehicle.vehicleName}
             </Link>
           </td>
 
-          <td>{jobsite.address}</td>
-          <td>{jobsite.ownerEmail}</td>
-          <td>{jobsite.ownerPhone}</td>
-          <td>{jobsite.workOrderID}</td>
-          <td>{jobsite.workBudget}</td>
-          <td>{jobsite.stageOfWork}</td>
+          <td>{vehicle.vehicleNo}</td>
+          <td><Moment format="DD/MM/YYYY" date={vehicle.registrationDate} /></td>
+          <td>
+            <Moment format="DD/MM/YYYY" date={vehicle.wofDate} />
+          </td>
+          <td><Moment format="DD/MM/YYYY" date={vehicle.servicingDate} /></td>
           <td>  {finalusers.map((usr) => <div> {usr} </div>)}</td>
           <td>
-            <Dropdown onChange={changeStatus}>
+            <Dropdown>
               <DropdownToggle hasIcon={false}>
                 <Button
                   isLink
-                  color={jobsite.status == "Active" ? "success" : "danger"}
+                  color={vehicle.status == "Active" ? "success" : "danger"}
                   icon='Circle'
-                  value={jobsite.status}
+                  value={vehicle.status}
                   className='text-nowrap' onChange={changeStatus}>
-                  {jobsite.status}
+                  {vehicle.status}
                 </Button>
               </DropdownToggle>
               <DropdownMenu>
@@ -179,7 +190,7 @@ const ListAllJobsites = () => {
             </Dropdown>
           </td>
           <td>
-            <Link to={`../${demoPages.Jobsites.subMenu.editJobsite.path}/${jobsite._id}`}>
+            <Link to={`../${demoPages.Vehicle.subMenu.editVehicle.path}/${vehicle._id}`}>
               <Button
                 isOutline={!darkModeStatus}
                 color='dark'
@@ -195,98 +206,70 @@ const ListAllJobsites = () => {
 
           </td>
         </tr>
-
       );
     });
-
-
   }
 
-
-  let jobsiteLoading;
+  let vehicleLoading;
 
   if (loading) {
-    jobsiteLoading = (
+    vehicleLoading = (
       <tr>
-        <td colSpan="11">
+        <td colSpan="7">
           <h3>Loading...</h3>
         </td>
       </tr>
     );
   } else {
-    jobsiteLoading = jobsiteTable;
+    vehicleLoading = vehicleTable;
   }
 
-  const searchJob = (e) => {
-    axios.get(`${BASE_URL}/api/jobsites`).then((res) => {
-      console.log("jobsites", res.data);
+
+  // const searchbyStatus = (e) => {
+  //   setStatus(e.target.value);
+  //   axios.get(`${BASE_URL}/api/jobsites`).then((res) => {
+  //     console.log("jobsites", res.data);
+  //     let status = e.target.value;
+  //     let jobsiteData = res.data;
+
+  //     if (status === 'All') {
+  //       setJobsites(jobsiteData);
+  //     } else {
+  //       var jobsiteResult = _.filter(jobsiteData, ['status', status]);
+
+  //       setJobsites(jobsiteResult);
+  //     }
+  //   });
+  // }
+
+  // const searchByAssigned = (e) => {
+  //   setAssigned(e.target.value);
+  //   axios.get(`${BASE_URL}/api/jobassigntoemployees`)
+  //     .then(res => setAssignedJobsites(res.data));
+  // }
+
+
+  const searchVehicle = (e) => {
+
+
+    axios.get(`${BASE_URL}/api/vehicles`).then((res) => {
+      console.log("vehicles", res.data);
 
       let search = e.target.value;
-      let jobsiteData = res.data;
+      let vehiclesData = res.data;
 
-      var jobsiteResult = _.filter(jobsiteData, function (obj) {
-        return (
-          obj.address.indexOf(search) !== -1 ||
-          obj.ownerName.indexOf(search) !== -1 ||
-          obj.ownerName.indexOf(_.capitalize(search)) !== -1 ||
-          obj.ownerName.indexOf(_.upperCase(search)) !== -1 ||
-          obj.ownerName.indexOf(_.lowerCase(search)) !== -1 ||
-          obj.workOrderID.indexOf(search) !== -1
-        );
+      var vehicleResult = _.filter(vehiclesData, function (obj) {
+        return ((obj.vehicleName.indexOf(search) !== -1) || (obj.vehicleNo.indexOf(search) !== -1));
+
+
       });
 
-      setJobsites(jobsiteResult);
-    });
-  };
+      setVehicles(vehicleResult);
 
-  const searchbyStatus = (e) => {
-    setStatus(e.target.value);
-    axios.get(`${BASE_URL}/api/jobsites`).then((res) => {
-      console.log("jobsites", res.data);
-      let status = e.target.value;
-      let jobsiteData = res.data;
 
-      if (status === 'All') {
-        setJobsites(jobsiteData);
-      } else {
-        var jobsiteResult = _.filter(jobsiteData, ['status', status]);
 
-        setJobsites(jobsiteResult);
-      }
     });
   }
-
-  const searchByAssigned = (e) => {
-    setAssigned(e.target.value);
-
-    axios.get(`${BASE_URL}/api/jobsites`).then((res) => {
-      console.log("jobsites", res.data);
-      let assignedValue = e.target.value;
-      let jobsiteData = res.data;
-
-      if (assignedValue === 'All') {
-        setJobsites(jobsiteData);
-      } else if (assignedValue === 'Unassigned') {
-        var jobsiteResult = _.filter(jobsiteData, ['workersList', '[]']);
-        console.log("unassigned", jobsiteResult);
-
-        setJobsites(jobsiteResult);
-      }
-      else  {
-        var jobsiteResult = jobsiteData.map((jobsite) => {
-          if (!jobsite.workersList) {
-            return jobsite;
-          }
-        });
-
-        console.log("assigned", jobsiteResult);
-
-        setJobsites(jobsiteResult);
-      }
-    });
-
-  }
-
 
 
 
@@ -303,8 +286,7 @@ const ListAllJobsites = () => {
               type='search'
               className='border-0 shadow-none bg-transparent'
               placeholder='Search...'
-              onChange={searchJob}
-
+              onChange={searchVehicle}
               autoComplete='off'
             />
           </div>
@@ -337,7 +319,7 @@ const ListAllJobsites = () => {
 
                   <div className='col-12'>
                     <FormGroup>
-                      <Label htmlFor='assignedFilter'>Jobsite Type</Label>
+                      <Label htmlFor='assignedFilter'>Vehicle Type</Label>
                       <Select
                         id='assignedFilter'
                         ariaLabel='type'
@@ -356,7 +338,7 @@ const ListAllJobsites = () => {
                   </div>
                   <div className='col-12'>
                     <FormGroup>
-                      <Label htmlFor='statusFilter'>Jobsite Status</Label>
+                      <Label htmlFor='statusFilter'>Vehicle Status</Label>
                       <Select
                         id='statusFilter'
                         ariaLabel='status'
@@ -386,9 +368,9 @@ const ListAllJobsites = () => {
       <Page container='fluid'>
         <Card >
           <CardHeader borderSize={1}>
-            <CardLabel icon='Business' >
+            <CardLabel icon='Train' >
 
-              <CardTitle>Jobsites</CardTitle>
+              <CardTitle>Vehicles</CardTitle>
 
             </CardLabel>
             <CardActions>
@@ -400,34 +382,26 @@ const ListAllJobsites = () => {
 
 
           <CardBody className='table-responsive' >
+
+
             <table className='table table-modern'>
               <thead>
                 <tr>
 
-                  <th>Name</th>
-                  <th>Address</th>
-                  <th>Email</th>
-                  <th>Phone</th>
-                  <th>Quote Number</th>
-                  <th>Work Budget ($)</th>
-                  <th> Stage of work </th>
-                  <th> Assigned Worker(s) </th>
-
+                  <th>Vehicle Make/Model</th>
+                  <th>Plate No</th>
+                  <th>Registration Date</th>
+                  <th>WOF Date</th>
+                  <th>Servicing Date</th>
+                  <th>Assigned Worker(s)</th>
                   <th>Status</th>
-
                   <td />
 
                 </tr>
               </thead>
               <tbody>
-                {jobsiteLoading}
-              </tbody>
-            </table>
-
-
-
-
-            {/* {filteredData.map((i) => (
+                {vehicleLoading}
+                {/* {filteredData.map((i) => (
 									<CommonTableRow
 										key={i.id}
 										// eslint-disable-next-line react/jsx-props-no-spreading
@@ -439,10 +413,11 @@ const ListAllJobsites = () => {
 										)}
 									/>
 								))} */}
-
+              </tbody>
+            </table>
           </CardBody>
           <PaginationButtons
-            data={jobsites}
+            data={vehicles}
             label='items'
             setCurrentPage={setCurrentPage}
             currentPage={currentPage}
@@ -458,7 +433,7 @@ const ListAllJobsites = () => {
 };
 
 
-ListAllJobsites.propTypes = {
+ListAllVehicles.propTypes = {
   auth: PropTypes.object.isRequired,
 };
 
@@ -467,4 +442,4 @@ const mapStateToProps = (state) => ({
   auth: state.auth,
 });
 
-export default connect(mapStateToProps)(ListAllJobsites);
+export default connect(mapStateToProps)(ListAllVehicles);

@@ -32,7 +32,7 @@ import axios from "axios";
 import { BASE_URL } from "../../../actions/actionConstant";
 import PaginationButtons, { dataPagination, PER_COUNT } from '../../../components/PaginationButtons';
 import useDarkMode from '../../../hooks/useDarkMode';
-import EVENT_TASK from '../../common/data/enumEventTasks';
+import EVENT_STATUS from '../../common/data/enumEventStatus';
 import Input from '../../../components/bootstrap/forms/Input';
 import { useFormik } from 'formik';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
@@ -41,164 +41,115 @@ import Select from '../../../components/bootstrap/forms/Select';
 import CommonFilterTag from '../../common/CommonFilterTag';
 import Moment from "react-moment";
 
-const ListAllTasks = () => {
+const ListAllJobsites = () => {
   const { themeStatus, darkModeStatus } = useDarkMode();
 
-  const [tasks, setTasks] = useState([]);
-  const [perPage, setPerPage] = useState(PER_COUNT['5']);
+
+
+  const [jobsitesmaterialpurchases, setJobsitesmaterialpurchases] = useState(
+    []
+  );
+  const [jobsites, setJobsites] = useState([]);
+  const [jobsite, setJobsite] = useState();
   const [modal, setModal] = useState(false);
-  const [taskId, setTaskId] = useState("");
-  const [users, setUsers] = useState([]);
+  const [jobsitesmaterialpurchaseId, setJobsitesmaterialpurchaseId] =
+    useState("");
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [tasksPerPage] = useState(10);
+  const [jobsitesmaterialpurchasesPerPage] = useState(10);
+  const [perPage, setPerPage] = useState(PER_COUNT['5'])
+  const [jobsiteList, setJobsitesList] = useState([]);
   const [filteredJobsite, setFilteredValue] = useState("All");
-  const [jobsite, setJobsite] = useState();
-  const [jobsites, setJobsites] = useState([]);
 
   React.useEffect(() => {
-
     setLoading(true);
-    axios.get(`${BASE_URL}/api/tasks`).then((res) => {
-      setTasks(res.data);
-      setLoading(false);
-    });
-
     axios.get(`${BASE_URL}/api/jobsites`).then((res) => {
+      console.log("jobsites", res.data);
+
       setJobsites(res.data);
     });
 
-    axios.get(`${BASE_URL}/api/users`).then((res) => {
-      setUsers(res.data);
+    axios.get(`${BASE_URL}/api/jobsitesmaterialpurchases`).then((res) => {
+      setJobsitesmaterialpurchases(res.data);
+
     });
+
+
+    setLoading(false);
   }, []);
 
   const openModal = (id) => {
-    // setTaskId(id)
+    // setJobsiteId(id)
     setModal(!modal);
-    setTaskId(id);
-    console.log("Task:", id);
+    setJobsitesmaterialpurchaseId(id);
+    console.log("Jobsitesmaterialpurchase:", id);
   };
 
-  const changeStatus = (e) => {
-    e.preventDefault();
-    console.log("value changed", e.target.value);
-  }
-  // // const { themeStatus, darkModeStatus } = useDarkMode();
-  // const [currentPage, setCurrentPage] = useState(1);
 
-
-  // const { users, requestSort, getClassNamesFor } = useSortableData(userdata);
-
-  // console.log("sorted users", users);
-  // const { jsonUsers } = JSON.stringify(users);
-  let taskTable;
+  let jobsitesmaterialpurchaseTable;
 
   // Get current posts
-  const indexOfLastTask = currentPage * tasksPerPage;
-  const indexOfFirstTask = indexOfLastTask - tasksPerPage;
-  const currentTasks = tasks.slice(indexOfFirstTask, indexOfLastTask);
+  const indexOfLastJobsitesmaterialpurchase =
+    currentPage * jobsitesmaterialpurchasesPerPage;
+  const indexOfFirstJobsitesmaterialpurchase =
+    indexOfLastJobsitesmaterialpurchase - jobsitesmaterialpurchasesPerPage;
+  const currentJobsitesmaterialpurchases = jobsitesmaterialpurchases.slice(
+    indexOfFirstJobsitesmaterialpurchase,
+    indexOfLastJobsitesmaterialpurchase
+  );
 
   // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  console.log("jobsitesmaterialpurchases:", currentJobsitesmaterialpurchases);
 
-  if (currentTasks.length === 0) {
-    taskTable = (
+  if (currentJobsitesmaterialpurchases.length === 0) {
+    jobsitesmaterialpurchaseTable = (
       <tr>
         <td colSpan="6">No records</td>
       </tr>
     );
   } else {
-    taskTable = _.map(currentTasks, (task) => {
-      // let users = _.filter(users, ['_id', task.user]);
+    jobsitesmaterialpurchaseTable = _.map(
+      currentJobsitesmaterialpurchases,
+      (jobsitesmaterialpurchase) => {
 
-      let jobsiteList = _.map(jobsites, (job) => {
-        if (job._id == task.jobsite) {
-          return (
-            <option key={job._id} value={job._id}>
-              {job.address}
-            </option>
-          );
+        console.log(jobsitesmaterialpurchase);
+        let jobsite;
+        let address;
+
+        if (jobsites && jobsites.length === 0) {
+          address = "";
+        } else {
+          jobsite = _.filter(jobsites, [
+            "_id",
+            jobsitesmaterialpurchase.jobsite,
+          ]);
+
+          console.log(jobsite)
+          //address = "";
+          address = jobsite[0] && jobsite[0].address;
         }
 
-      });
+        return (
+          <tr key={jobsitesmaterialpurchase._id}>
+            <td>
+              <Link to={`../${demoPages.Material.subMenu.editMaterial.path}/${jobsitesmaterialpurchase._id}`}>
+                {jobsitesmaterialpurchase.materialName}
+              </Link></td>
+            <td>
 
-      let workersList = task.workersAssign;
-
-      let finalusers = [];
-      workersList.map((wrk) => {
-        _.map(users, (user) => {
-          if (user._id == wrk) {
-            console.log("matching ", user._id, "name", user.username, "work", wrk);
-            finalusers.push(user.username);
-          }
-        })
-      });
-
-      console.log(finalusers);
+              {address}
+            </td>
 
 
-
-      //  console.log("woekres is", workersList);
-      return (
-        <tr key={task._id}>
-          <td>
-
-            <Link to={`../${demoPages.Tasks.subMenu.editTasks.path}/${task._id}`}>
-              {task.taskTitle}
-            </Link>
-          </td>
-          <td>{jobsiteList}</td>
-          <td> {finalusers.map(worker => {
-            return (
-              <div className="form-control"> {worker} {""} </div>
-            )
-          }
-
-
-
-          )}</td>
-
-
-          <td>
-            <Moment date={task.startDate} format={'DD/MM/YYYY'} />
-          </td>
-          <td>
-            <Moment date={task.endDate} format={'DD/MM/YYYY'} />
-          </td>
-
-
-
-          <td>
-            <Dropdown>
-              <DropdownToggle hasIcon={false}>
-                <Button
-                  isLink
-                  color={task.status == "Completed" ? "success" : "danger"}
-                  icon='Circle'
-                  value={task.status}
-                  className='text-nowrap' onChange={changeStatus}>
-                  {task.status}
-                </Button>
-              </DropdownToggle>
-              <DropdownMenu>
-                {Object.keys(EVENT_TASK).map((key) => (
-                  <DropdownItem key={key}>
-                    <div>
-                      <Icon
-                        icon='Circle'
-                        color={EVENT_TASK[key].color}
-                      />
-                      {EVENT_TASK[key].name}
-                    </div>
-                  </DropdownItem>
-                ))}
-              </DropdownMenu>
-            </Dropdown>
-          </td>
-          <td>
-          <Link to={`../${demoPages.Tasks.subMenu.editTasks.path}/${task._id}`}>
+            <td>{jobsitesmaterialpurchase.quantity}</td>
+            <td>{jobsitesmaterialpurchase.totalCost}</td>
+            <td>
+              <Moment date={new Date(jobsitesmaterialpurchase.createdAt)} />
+            </td>
+            <td>
+              <Link to={`../${demoPages.Material.subMenu.editMaterial.path}/${jobsitesmaterialpurchase._id}`}>
                 <Button
                   isOutline={!darkModeStatus}
                   color='dark'
@@ -214,43 +165,32 @@ const ListAllTasks = () => {
 
             </td>
 
-        </tr>
-      );
-    });
-  }
 
-  let taskLoading;
-
-  if (loading) {
-    taskLoading = (
-      <tr>
-        <td colSpan="6">
-          <h3>Loading...</h3>
-        </td>
-      </tr>
+          </tr>
+        );
+      }
     );
-  } else {
-    taskLoading = taskTable;
   }
 
+  const searchMaterials = (e) => {
+    axios.get(`${BASE_URL}/api/jobsitesmaterialpurchases`).then((res) => {
 
 
-
-  const searchTasks = (e) => {
-    console.log("reaching");
-    axios.get(`${BASE_URL}/api/tasks`).then((res) => {
-     
-    
       let search = e.target.value;
-      let taskData = res.data;
+      let materialData = res.data;
 
-      var taskResult = _.filter(taskData, function (obj) {
+      var materialResult = _.filter(materialData, function (obj) {
+
         return (
-          obj.taskTitle.indexOf(search) !== -1 
+          obj.materialName.indexOf(search) !== -1 ||
+          obj.materialName.indexOf(_.capitalize(search)) !== -1 ||
+          obj.materialName.indexOf(_.upperCase(search)) !== -1 ||
+          obj.materialName.indexOf(_.lowerCase(search)) !== -1
         );
       });
 
-      setTasks(taskResult);
+
+      setJobsitesmaterialpurchases(materialResult);
     });
   };
 
@@ -259,17 +199,17 @@ const ListAllTasks = () => {
     console.log("filter by", e.target.value);
     setFilteredValue(e.target.value);
     axios
-      .get(`${BASE_URL}/api/tasks`)
+      .get(`${BASE_URL}/api/jobsitesmaterialpurchases`)
       .then((res) => {
         let jobsiteId = e.target.value;
 
         if (jobsiteId == "All") {
-          setTasks(res.data);
+          setJobsitesmaterialpurchases(res.data);
         } else {
           let materials = res.data;
 
           let filterMaterial = _.filter(materials, ['jobsite', jobsiteId]);
-          setTasks(filterMaterial);
+          setJobsitesmaterialpurchases(filterMaterial);
 
           _.map(jobsites, (jobsite) => {
             if (jobsite._id == jobsiteId) {
@@ -284,7 +224,20 @@ const ListAllTasks = () => {
       });
   }
 
-  
+  let jobsitesmaterialpurchaseLoading;
+
+  if (loading) {
+    jobsitesmaterialpurchaseLoading = (
+      <tr>
+        <td colSpan="6">
+          <h3>Loading...</h3>
+        </td>
+      </tr>
+    );
+  } else {
+    jobsitesmaterialpurchaseLoading = jobsitesmaterialpurchaseTable;
+  }
+
   let listJobsites = [];
   listJobsites.push({
     label: "All",
@@ -303,7 +256,6 @@ const ListAllTasks = () => {
 
   console.log("Jobsotes list", listJobsites);
 
-
   return (
     <PageWrapper title="Jobsites">
       <SubHeader>
@@ -317,7 +269,8 @@ const ListAllTasks = () => {
               type='search'
               className='border-0 shadow-none bg-transparent'
               placeholder='Search...'
-              onChange={searchTasks}
+              onChange={searchMaterials}
+
               autoComplete='off'
             />
           </div>
@@ -368,15 +321,16 @@ const ListAllTasks = () => {
 
 
         </SubHeaderRight>
+
       </SubHeader>
 
 
       <Page container='fluid'>
         <Card >
           <CardHeader borderSize={1}>
-            <CardLabel icon='Task2' >
+            <CardLabel icon='PaintBucket' >
 
-              <CardTitle>Tasks</CardTitle>
+              <CardTitle>Jobsite's Materials</CardTitle>
 
             </CardLabel>
             <CardActions>
@@ -389,25 +343,31 @@ const ListAllTasks = () => {
 
           <CardBody className='table-responsive' >
 
-
             <table className='table table-modern'>
               <thead>
                 <tr>
-
-                  <th>Task Name</th>
+                  <th>Item Name</th>
                   <th>Jobsite</th>
-                  <th>Workers</th>
-                  <th>Start Date</th>
-                  <th>End date</th>
 
-                  <th>Status</th>
+                  <th>Quantity</th>
+                  <th>Total Cost</th>
+                  <th>Purchased Date</th>
+
+
+
                   <td />
 
                 </tr>
               </thead>
               <tbody>
-                {taskLoading}
-                {/* {filteredData.map((i) => (
+                {jobsitesmaterialpurchaseLoading}
+              </tbody>
+            </table>
+
+
+
+
+            {/* {filteredData.map((i) => (
 									<CommonTableRow
 										key={i.id}
 										// eslint-disable-next-line react/jsx-props-no-spreading
@@ -419,11 +379,10 @@ const ListAllTasks = () => {
 										)}
 									/>
 								))} */}
-              </tbody>
-            </table>
+
           </CardBody>
           <PaginationButtons
-            data={tasks}
+            data={jobsitesmaterialpurchases}
             label='items'
             setCurrentPage={setCurrentPage}
             currentPage={currentPage}
@@ -439,7 +398,7 @@ const ListAllTasks = () => {
 };
 
 
-ListAllTasks.propTypes = {
+ListAllJobsites.propTypes = {
   auth: PropTypes.object.isRequired,
 };
 
@@ -448,4 +407,4 @@ const mapStateToProps = (state) => ({
   auth: state.auth,
 });
 
-export default connect(mapStateToProps)(ListAllTasks);
+export default connect(mapStateToProps)(ListAllJobsites);

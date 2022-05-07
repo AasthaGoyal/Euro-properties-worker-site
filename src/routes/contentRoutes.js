@@ -26,6 +26,18 @@ const TASKS = {
   EDITTASK: lazy(() => import('../pages/presentation/Tasks/EditTasks')),
 }
 
+const VEHICLES = {
+  NEWVEHICLE: lazy(() => import('../pages/presentation/Vehicles/AddNewVehicle')),
+	LISTVEHICLE: lazy(() => import('../pages/presentation/Vehicles/ListAllVehicles')),	
+  EDITVEHICLE: lazy(() => import('../pages/presentation/Vehicles/EditVehicle')),
+}
+
+const MATERIAL = {
+  NEWMATERIAL: lazy(() => import('../pages/presentation/Material/AddMaterial')),
+	LISTMATERIAL: lazy(() => import('../pages/presentation/Material/ListAllMaterials')),	
+  EDITMATERIAL: lazy(() => import('../pages/presentation/Material/EditMaterial')),
+}
+
 // const PAGE_LAYOUTS = {
 // 	HEADER_SUBHEADER: lazy(() => import('../pages/presentation/page-layouts/HeaderAndSubheader')),
 // 	HEADER: lazy(() => import('../pages/presentation/page-layouts/OnlyHeader')),
@@ -105,6 +117,36 @@ const presentation = [
   {
 		path: `${demoPages.Tasks.subMenu.editTasks.path}/:id`,
 		element: <TASKS.EDITTASK />,
+		exact: true,
+	},
+  {
+		path: demoPages.Vehicle.subMenu.addVehicle.path,
+		element: <VEHICLES.NEWVEHICLE />,
+		exact: true,
+	},
+  {
+		path: demoPages.Vehicle.subMenu.viewVehicle.path,
+		element: <VEHICLES.LISTVEHICLE />,
+		exact: true,
+	},
+  {
+		path: `${demoPages.Vehicle.subMenu.editVehicle.path}/:id`,
+		element: <VEHICLES.EDITVEHICLE />,
+		exact: true,
+	},
+  {
+		path: demoPages.Material.subMenu.addMaterial.path,
+		element: <MATERIAL.NEWMATERIAL />,
+		exact: true,
+	},
+  {
+		path: demoPages.Material.subMenu.viewMaterial.path,
+		element: <MATERIAL.LISTMATERIAL />,
+		exact: true,
+	},
+  {
+		path: `${demoPages.Material.subMenu.editMaterial.path}/:id`,
+		element: <MATERIAL.EDITMATERIAL />,
 		exact: true,
 	},
 
