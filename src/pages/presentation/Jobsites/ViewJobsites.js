@@ -64,6 +64,10 @@ const ProductViewPage = () => {
   const [redirect, setRedirect] = useState(false);
   const [workersAssign, setWorkersAssign] = useState([]);
   const [workersId, setWorkersId] = useState([]);
+  const [jobsiteAddress, setAddress] = useState();
+  const [latitude, setLatitude] = useState();
+  const [longitude, setLongitude] = useState();
+
 
   const validateJobsite = (values) => {
     const errors = {};
@@ -80,9 +84,6 @@ const ProductViewPage = () => {
       errors.stageWork = 'Required';
     }
 
-    if (!values.jobsiteAddress) {
-      errors.jobsiteAddress = 'Required';
-    }
 
 
 
@@ -155,12 +156,12 @@ const ProductViewPage = () => {
 
 
       const jobsiteObject = {
-        address: values.jobsiteAddress,
+        address: jobsiteAddress,
         ownerName: values.ownerName,
         ownerEmail: values.ownerEmail,
         ownerPhone: values.ownerPhone,
-        latitude: values.latitude,
-        longitude: values.longitude,
+        latitude: latitude,
+        longitude: longitude,
         workOrderID: values.workOrderID,
         workBudget: values.workBudget,
         note: values.note,
@@ -208,12 +209,12 @@ const ProductViewPage = () => {
       console.log("address details", values);
 
       const jobsiteObject = {
-        address: values.jobsiteAddress,
+        address: jobsiteAddress,
         ownerName: values.ownerName,
         ownerEmail: values.ownerEmail,
         ownerPhone: values.ownerPhone,
-        latitude: values.latitude,
-        longitude: values.longitude,
+        latitude: latitude,
+        longitude: longitude,
         workOrderID: values.workOrderID,
         workBudget: values.workBudget,
         note: values.note,
@@ -251,12 +252,12 @@ const ProductViewPage = () => {
 
 
     const jobsiteObject = {
-      address: values.jobsiteAddress,
+      address: jobsiteAddress,
       ownerName: values.ownerName,
       ownerEmail: values.ownerEmail,
       ownerPhone: values.ownerPhone,
-      latitude: values.latitude,
-      longitude: values.longitude,
+      latitude: latitude,
+      longitude: longitude,
       workOrderID: values.workOrderID,
       workBudget: values.workBudget,
       note: values.note,
@@ -346,6 +347,9 @@ const ProductViewPage = () => {
         res.data.endDate && setEndDate(new Date(res.data.endDate));
 
         res.data.workersList && setWorkersId(res.data.workersList);
+        setAddress(res.data.address);
+        setLatitude(res.data.latitude);
+        setLongitude(res.data.longitude);
 
       });
 
@@ -357,6 +361,28 @@ const ProductViewPage = () => {
 
   }, []);
 
+  const changeAddress = (e) => {
+    setAddress(e.target.value);
+    const options = {
+      method: "GET",
+      url: "https://forward-reverse-geocoding.p.rapidapi.com/v1/search",
+      params: {
+        q: e.target.value,
+        "accept-language": "en",
+        polygon_threshold: "0.0",
+      },
+      headers: {
+        "x-rapidapi-host": "forward-reverse-geocoding.p.rapidapi.com",
+        "x-rapidapi-key": "ea4507803bmsh28397e1ce8773a4p1c95e8jsn0fff31110b37",
+      },
+    };
+
+    axios.request(options).then((response) => {
+      console.log("Address Testing:", response.data);
+      setLatitude(response.data[0].lat);
+      setLongitude(response.data[0].lon);
+    });
+  }
 
   let workers = [];
   _.map(users, (user) => {
@@ -633,15 +659,11 @@ const ProductViewPage = () => {
                         label='Address'
                         isFloating>
                         <Input
-                          onChange={formikJobsite.handleChange}
-                          onBlur={formikJobsite.handleBlur}
-                          value={formikJobsite.values.jobsiteAddress}
-                          isValid={formikJobsite.isValid}
-                          isTouched={formikJobsite.touched.jobsiteAddress}
-                          invalidFeedback={
-                            formikJobsite.errors.jobsiteAddress
-                          }
-                          validFeedback='Looks good!'
+                            type="text"
+                            name="address"
+                            className="form-control"
+                            onChange={changeAddress}
+                            value={jobsiteAddress}
                         />
                       </FormGroup>
                     </div>
@@ -652,16 +674,10 @@ const ProductViewPage = () => {
                         label='Latitude (Location)'
                         isFloating>
                         <Input
-                          onChange={formikJobsite.handleChange}
-                          isDisable="true"
-                          onBlur={formikJobsite.handleBlur}
-                          value={formikJobsite.values.latitude}
-                          isValid={formikJobsite.isValid}
-                          isTouched={formikJobsite.touched.latitude}
-                          invalidFeedback={
-                            formikJobsite.errors.latitude
-                          }
-                          validFeedback='Looks good!'
+                          type="text"
+                          name="latitude"
+                          className="form-control"
+                          value={latitude ? latitude : ""}
                         />
                       </FormGroup>
                     </div>
@@ -671,16 +687,10 @@ const ProductViewPage = () => {
                         label='Longitude (Location)'
                         isFloating>
                         <Input
-                          onChange={formikJobsite.handleChange}
-                          isDisable="true"
-                          onBlur={formikJobsite.handleBlur}
-                          value={formikJobsite.values.longitude}
-                          isValid={formikJobsite.isValid}
-                          isTouched={formikJobsite.touched.longitude}
-                          invalidFeedback={
-                            formikJobsite.errors.longitude
-                          }
-                          validFeedback='Looks good!'
+                          type="text"
+                          name="latitude"
+                          className="form-control"
+                          value={longitude ? longitude : ""}
                         />
                       </FormGroup>
                     </div>

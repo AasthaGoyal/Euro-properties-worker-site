@@ -27,7 +27,19 @@ import axios from "axios";
 import { BASE_URL } from "../../../actions/actionConstant";
 import PaginationButtons, { dataPagination, PER_COUNT } from '../../../components/PaginationButtons';
 import useDarkMode from '../../../hooks/useDarkMode';
-import EVENT_STATUS from '../../common/data/enumEventStatus';
+import SubHeader, {
+  SubHeaderLeft,
+  SubHeaderRight,
+  SubheaderSeparator,
+} from '../../../layout/SubHeader/SubHeader';
+import Input from '../../../components/bootstrap/forms/Input';
+import FormGroup from '../../../components/bootstrap/forms/FormGroup';
+import Label from '../../../components/bootstrap/forms/Label';
+import Select from '../../../components/bootstrap/forms/Select';
+import CommonFilterTag from '../../common/CommonFilterTag';
+
+import showNotification from '../../../components/extras/showNotification';
+
 
 const ListAllUsers = () => {
   const { themeStatus, darkModeStatus } = useDarkMode();
@@ -44,6 +56,7 @@ const ListAllUsers = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [usersPerPage] = useState(10);
   const [perPage, setPerPage] = useState(PER_COUNT['5']);
+  const [filteredUsertype, setFilteredUsertype] = useState("All");
 
   React.useEffect(() => {
     setLoading(true);
@@ -54,16 +67,64 @@ const ListAllUsers = () => {
     setLoading(false);
   }, []);
 
+
   const openModal = (id) => {
     // setUserId(id)
     setModal(!modal);
     setUserId(id);
     console.log("User:", id);
   };
-  
-  const changeStatus = (e) => {
-    e.preventDefault();
-    console.log("value changed", e.target.value);
+
+  const changeStatus = (id, value) => {
+
+    _.map(users, (auser) => {
+      if (auser._id == id) {
+        const userObject = {
+          userType: auser.userType,
+          username: auser.username,
+          firstName: auser.firstName,
+          lastName: auser.lastName,
+          email: auser.email,
+          password: auser.password,
+          phone: auser.phone,
+          address: auser.address,
+          status: value,
+          note: auser.note,
+          bankacc: auser.bankacc,
+          rate: auser.rate,
+          gst: auser.gst,
+          contractor: auser.contractor,
+          tax: auser.tax,
+          ird: auser.ird
+        };
+
+      
+        axios
+        .put(`${BASE_URL}/api/users/edit/${id}`, userObject)
+        .then((res) => {
+          if (res.status == 200) {
+            showNotification(
+              <span className='d-flex align-items-center'>
+                <Icon icon='Info' size='lg' className='me-1' />
+                <span>User's Status updated Successfully</span>
+              </span>,
+              "The user's status has been successfully updated.",
+            );
+          }
+        });
+
+          window.location.reload();
+          showNotification(
+            <span className='d-flex align-items-center'>
+              <Icon icon='Info' size='lg' className='me-1' />
+              <span>User's Status updated Successfully</span>
+            </span>,
+            "The user's status has been successfully updated.",
+          );
+      }
+    })
+
+
   }
   // // const { themeStatus, darkModeStatus } = useDarkMode();
   // const [currentPage, setCurrentPage] = useState(1);
@@ -79,6 +140,9 @@ const ListAllUsers = () => {
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
 
+
+
+
   if (currentUsers.length === 0) {
     userTable = (
       <tr>
@@ -86,6 +150,7 @@ const ListAllUsers = () => {
       </tr>
     );
   } else {
+    let statusList = [{text: "Active", value: "Active"}, {text: "Inactive", value: "Inactive"}]
     userTable = _.map(currentUsers, (user) => {
       return (
         <tr key={user._id}>
@@ -102,45 +167,61 @@ const ListAllUsers = () => {
           <td>{user.phone}</td>
           <td>{user.note}</td>
 
+
           <td>
-            <Dropdown onChange={changeStatus}>
+          <Dropdown >
               <DropdownToggle hasIcon={false}>
                 <Button
                   isLink
                   color={user.status == "Active" ? "success" : "danger"}
                   icon='Circle'
                   value={user.status}
-                  className='text-nowrap' onChange={changeStatus}>
+                  className='text-nowrap'>
                   {user.status}
                 </Button>
               </DropdownToggle>
-              <DropdownMenu>
-                {Object.keys(EVENT_STATUS).map((key) => (
-                  <DropdownItem key={key}>
-                    <div>
-                      <Icon
-                        icon='Circle'
-                        color={EVENT_STATUS[key].color}
-                      />
-                      {EVENT_STATUS[key].name}
-                    </div>
-                  </DropdownItem>
-                ))}
+              <DropdownMenu >
+
+                <DropdownItem key='active' value='active'  >
+                  <Button
+                    isLink
+                    color='success'
+                    icon='Circle'
+                    value='active'
+                    onClick={changeStatus.bind(this, user._id, "Active")}
+                    className='text-nowrap'>
+                    Active
+                  </Button>
+                </DropdownItem>
+                <DropdownItem key='inactive' value='inactive'  >
+                  <Button
+                    isLink
+                    color='danger'
+                    icon='Circle'
+                    value='inactive'
+                    onClick={changeStatus.bind(this, user._id, "Inactive")}
+                    className='text-nowrap'>
+                    Inactive
+                  </Button>
+                </DropdownItem>
+
               </DropdownMenu>
             </Dropdown>
+
+
           </td>
           <td>
-          <Link to={`../${demoPages.UserPages.subMenu.editUser.path}/${user._id}`}>
-            <Button
-              isOutline={!darkModeStatus}
-              color='dark'
-              isLight={darkModeStatus}
-              className={classNames('text-nowrap', {
-                'border-light': !darkModeStatus,
-              })}
-              icon='Edit'>
-              Edit
-            </Button>
+            <Link to={`../${demoPages.UserPages.subMenu.editUser.path}/${user._id}`}>
+              <Button
+                isOutline={!darkModeStatus}
+                color='dark'
+                isLight={darkModeStatus}
+                className={classNames('text-nowrap', {
+                  'border-light': !darkModeStatus,
+                })}
+                icon='Edit'>
+                Edit
+              </Button>
             </Link>
 
           </td>
@@ -167,25 +248,123 @@ const ListAllUsers = () => {
 
 
 
-  // const filteredData = data.filter(
-  // 	(f) =>
-  // 		// Category
-  // 		f.category === formik.values.categoryName &&
-  // 		// Price
-  // 		(formik.values.minPrice === '' || f.price > formik.values.minPrice) &&
-  // 		(formik.values.maxPrice === '' || f.price < formik.values.maxPrice) &&
-  // 		//	Company
-  // 		((formik.values.companyA ? f.store === 'Company A' : false) ||
-  // 			(formik.values.companyB ? f.store === 'Company B' : false) ||
-  // 			(formik.values.companyC ? f.store === 'Company C' : false) ||
-  // 			(formik.values.companyD ? f.store === 'Company D' : false)),
-  // );
+  const searchUsers = (e) => {
 
-  // const { selectTable, SelectAllCheck } = useSelectTable(filteredData);
+
+    axios.get(`${BASE_URL}/api/users`).then((res) => {
+      console.log("user", res.data);
+
+      let search = e.target.value;
+      let userData = res.data;
+
+      var userResult = _.filter(userData, function (obj) {
+        return ((obj.username.indexOf(search) !== -1) || (obj.email.indexOf(search) !== -1) || (obj.firstName.indexOf(search) !== -1) || (obj.lastName.indexOf(search) !== -1));
+
+
+      });
+
+      setUsers(userResult);
+    });
+  }
+
+  const searchByUsertype = (e) => {
+    e.preventDefault();
+
+    setFilteredUsertype(e.target.value);
+    let search = e.target.value;
+    if (search == "All") {
+      axios.get(`${BASE_URL}/api/users`).then((res) => {
+
+        setUsers(res.data);
+      });
+    } else {
+      axios.get(`${BASE_URL}/api/users`).then((res) => {
+
+        let userData = res.data;
+
+        let userResult = _.filter(userData, ['userType', search]);
+        setUsers(userResult);
+      });
+
+    }
+
+
+
+
+  }
 
   return (
     <PageWrapper title="Users">
+      <SubHeader>
+        <SubHeaderLeft>
+          <div className='d-flex' data-tour='search'>
+            <label className='border-0 bg-transparent cursor-pointer' htmlFor='searchInput'>
+              <Icon icon='Search' size='2x' color='primary' />
+            </label>
+            <Input
+              id='searchInput'
+              type='search'
+              className='border-0 shadow-none bg-transparent'
+              placeholder='Search...'
+              onChange={searchUsers}
 
+              autoComplete='off'
+            />
+          </div>
+        </SubHeaderLeft>
+        <SubHeaderRight>
+          {filteredUsertype && (
+            <CommonFilterTag title='User Type' text={filteredUsertype} />
+          )}
+          <SubheaderSeparator />
+          <Dropdown >
+            <DropdownToggle hasIcon={false}>
+              <Button icon='Filter' color='primary' isLight data-tour='filter'>
+                Filter
+
+              </Button>
+            </DropdownToggle>
+            <DropdownMenu
+              isAlignmentEnd
+              size='lg'
+              isCloseAfterLeave={false}
+              data-tour='filter-menu'>
+              <div className='container py-2'>
+                <form className='row g-3' >
+
+                  <div className='col-12'>
+                    <FormGroup>
+                      <Label htmlFor='statusFilter'> User Type </Label>
+                      <Select
+                        id='statusFilter'
+                        ariaLabel='status'
+                        placeholder='Jobsite'
+                        onChange={value => {
+
+                          searchByUsertype(value);
+                        }}
+                        list={[
+                          { value: 'All', text: 'All' },
+                          { value: 'Admin', text: 'Admin' },
+                          { value: 'Manager', text: 'Manager' },
+                          { value: 'Employee', text: 'Employee' }
+                        ]}
+                        value={filteredUsertype}
+
+                      />
+                    </FormGroup>
+                  </div>
+
+
+                </form>
+              </div>
+            </DropdownMenu>
+          </Dropdown>
+
+
+
+        </SubHeaderRight>
+      </SubHeader>
 
       <Page container='fluid'>
         <Card >
@@ -196,16 +375,7 @@ const ListAllUsers = () => {
 
             </CardLabel>
             <CardActions>
-              <Button
-                color='info'
-                icon='CloudDownload'
-                isLight
-                tag='a'
-                to={`../${demoPages.UserPages.subMenu.addUsers.path}`}
-                target='_blank'
-              >
-                Add New User
-              </Button>
+             
             </CardActions>
           </CardHeader>
 

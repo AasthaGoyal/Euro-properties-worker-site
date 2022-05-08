@@ -40,6 +40,7 @@ import Label from '../../../components/bootstrap/forms/Label';
 import Select from '../../../components/bootstrap/forms/Select';
 import CommonFilterTag from '../../common/CommonFilterTag';
 import Moment from "react-moment";
+import showNotification from '../../../components/extras/showNotification';
 
 const ListAllTasks = () => {
   const { themeStatus, darkModeStatus } = useDarkMode();
@@ -80,9 +81,48 @@ const ListAllTasks = () => {
     console.log("Task:", id);
   };
 
-  const changeStatus = (e) => {
-    e.preventDefault();
-    console.log("value changed", e.target.value);
+  const changeStatus = (id, value) => {
+
+
+    _.map(tasks, (task) => {
+      if (task._id == id) {
+
+        const taskObject = {
+          jobsite: task.jobsite,
+          taskTitle: task.taskTitle,
+          taskDescription: task.taskDescription,
+          startDate: task.startDate,
+          endDate: task.endDate,
+          workersAssign: task.workersAssign,
+          status: value,
+        };
+        
+        axios
+          .put(`${BASE_URL}/api/tasks/edit/${id}`, taskObject)
+          .then((res) => {
+            if (res.status == 200) {
+              showNotification(
+                <span className='d-flex align-items-center'>
+                  <Icon icon='Info' size='lg' className='me-1' />
+                  <span>Task's status Updated Successfully</span>
+                </span>,
+                "The Task's status has been updated successfully.",
+              );
+            }
+          });
+
+        window.location.reload();
+        showNotification(
+          <span className='d-flex align-items-center'>
+            <Icon icon='Info' size='lg' className='me-1' />
+            <span>Task's status Updated Successfully</span>
+          </span>,
+          "The Task's status has been updated successfully.",
+        );
+      }
+    })
+
+
   }
   // // const { themeStatus, darkModeStatus } = useDarkMode();
   // const [currentPage, setCurrentPage] = useState(1);
@@ -183,36 +223,47 @@ const ListAllTasks = () => {
                 </Button>
               </DropdownToggle>
               <DropdownMenu>
-                {Object.keys(EVENT_TASK).map((key) => (
-                  <DropdownItem key={key}>
-                    <div>
-                      <Icon
-                        icon='Circle'
-                        color={EVENT_TASK[key].color}
-                      />
-                      {EVENT_TASK[key].name}
-                    </div>
-                  </DropdownItem>
-                ))}
+                <DropdownItem key='completed' value='completed'  >
+                  <Button
+                    isLink
+                    color='success'
+                    icon='Circle'
+                    value='Completed'
+                    onClick={changeStatus.bind(this, task._id, "Completed")}
+                    className='text-nowrap'>
+                    Completed
+                  </Button>
+                </DropdownItem>
+                <DropdownItem key='pending' value='pending'  >
+                  <Button
+                    isLink
+                    color='danger'
+                    icon='Circle'
+                    value='Pending'
+                    onClick={changeStatus.bind(this, task._id, "Pending")}
+                    className='text-nowrap'>
+                    Pending
+                  </Button>
+                </DropdownItem>
               </DropdownMenu>
             </Dropdown>
           </td>
           <td>
-          <Link to={`../${demoPages.Tasks.subMenu.editTasks.path}/${task._id}`}>
-                <Button
-                  isOutline={!darkModeStatus}
-                  color='dark'
-                  isLight={darkModeStatus}
-                  className={classNames('text-nowrap', {
-                    'border-light': !darkModeStatus,
-                  })}
-                  icon='Edit'>
-                  Edit
-                </Button>
-              </Link>
+            <Link to={`../${demoPages.Tasks.subMenu.editTasks.path}/${task._id}`}>
+              <Button
+                isOutline={!darkModeStatus}
+                color='dark'
+                isLight={darkModeStatus}
+                className={classNames('text-nowrap', {
+                  'border-light': !darkModeStatus,
+                })}
+                icon='Edit'>
+                Edit
+              </Button>
+            </Link>
 
 
-            </td>
+          </td>
 
         </tr>
       );
@@ -239,14 +290,14 @@ const ListAllTasks = () => {
   const searchTasks = (e) => {
     console.log("reaching");
     axios.get(`${BASE_URL}/api/tasks`).then((res) => {
-     
-    
+
+
       let search = e.target.value;
       let taskData = res.data;
 
       var taskResult = _.filter(taskData, function (obj) {
         return (
-          obj.taskTitle.indexOf(search) !== -1 
+          obj.taskTitle.indexOf(search) !== -1
         );
       });
 
@@ -284,7 +335,7 @@ const ListAllTasks = () => {
       });
   }
 
-  
+
   let listJobsites = [];
   listJobsites.push({
     label: "All",

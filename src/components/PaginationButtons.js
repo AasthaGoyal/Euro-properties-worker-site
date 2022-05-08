@@ -76,9 +76,7 @@ const PaginationButtons = ({ setCurrentPage, currentPage, perPage, setPerPage, d
 
 	return (
 		<CardFooter>
-			<CardFooterLeft>
-				<span className='text-muted'>{getInfo()}</span>
-			</CardFooterLeft>
+		
 
 			<CardFooterRight className='d-flex'>
 				{totalPage > 1 && (
@@ -117,20 +115,7 @@ const PaginationButtons = ({ setCurrentPage, currentPage, perPage, setPerPage, d
 					</Pagination>
 				)}
 
-				<Select
-					size='sm'
-					ariaLabel='Per'
-					onChange={(e) => {
-						setPerPage(parseInt(e.target.value, 10));
-						setCurrentPage(1);
-					}}
-					value={perPage.toString()}>
-					{Object.keys(PER_COUNT).map((i) => (
-						<Option key={i} value={i}>
-							{i}
-						</Option>
-					))}
-				</Select>
+			
 			</CardFooterRight>
 		</CardFooter>
 	);

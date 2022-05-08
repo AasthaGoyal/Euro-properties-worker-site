@@ -34,7 +34,7 @@ export const dashboardMenu = {
 	dashboard: {
 		id: 'dashboard',
 		text: 'Dashboard',
-		path: '/',
+		path: 'dashboard',
 		icon: 'Dashboard',
 		subMenu: null,
 	},
@@ -128,12 +128,6 @@ export const demoPages = {
       
 		},
 	},
-  invoices: {
-		id: 'invoices',
-		text: 'Invoices & Payslips',
-		path: 'grid-pages',
-		icon: 'PointOfSale'
-	},
 	Vehicle: {
 		id: 'vehicle',
 		text: 'Vehicles',
@@ -186,12 +180,27 @@ export const demoPages = {
       }
 		},
 	},
-  reports: {
-		id: 'reports',
-		text: 'Reports',
-		path: 'pricing-table',
-		icon: 'Receipt',
+  Payroll: {
+		id: 'payroll',
+		text: 'Employee Payroll',
+		path: 'payroll-pages',
+		icon: 'PointOfSale',
+		subMenu: {
+			payslips: {
+				id: 'payslips',
+				text: 'Payslips',
+				path: 'payroll-pages/payslips',
+				icon: 'CashCoin',
+			},
+      timesheets: {
+        id: 'timesheets',
+				text: 'Timesheets',
+				path: 'payroll-pages/timesheets',
+				icon: 'Calendar3',
+      }
+		},
 	},
+
 
 	auth: {
 		id: 'auth',
@@ -201,7 +210,7 @@ export const demoPages = {
 	login: {
 		id: 'login',
 		text: 'Login',
-		path: 'auth-pages/login',
+		path: '/',
 		icon: 'Login',
 	},
 	signUp: {

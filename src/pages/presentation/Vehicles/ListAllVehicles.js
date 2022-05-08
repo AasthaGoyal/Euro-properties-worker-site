@@ -40,6 +40,7 @@ import Label from '../../../components/bootstrap/forms/Label';
 import Select from '../../../components/bootstrap/forms/Select';
 import CommonFilterTag from '../../common/CommonFilterTag';
 import Moment from "react-moment";
+import showNotification from '../../../components/extras/showNotification';
 
 const ListAllVehicles = () => {
   const { themeStatus, darkModeStatus } = useDarkMode();
@@ -75,10 +76,6 @@ const ListAllVehicles = () => {
     console.log("Vehicle:", id);
   };
 
-  const changeStatus = (e) => {
-    e.preventDefault();
-    console.log("value changed", e.target.value);
-  }
 
   const searchbyStatus = (e) => {
     setStatus(e.target.value);
@@ -99,6 +96,49 @@ const ListAllVehicles = () => {
     });
   }
 
+  const changeStatus = (id, value) => {
+
+  
+    _.map(vehicles, (vehicle) => {
+      if (vehicle._id == id) {
+        const vehicleObject = {
+          vehicleName: vehicle.vehicleName,
+          vehicleNo: vehicle.vehicleNo,
+          registrationDate: vehicle.registrationDate,
+          wofDate: vehicle.wofDate,
+          servicingDate: vehicle.servicingDate,
+          status: value,
+          workersList: vehicle.workersList
+        };
+    
+        axios
+          .put(`${BASE_URL}/api/vehicles/edit/${id}`, vehicleObject)
+          .then((res) => {
+            if (res.status == 200) {
+              showNotification(
+                <span className='d-flex align-items-center'>
+                  <Icon icon='Info' size='lg' className='me-1' />
+                  <span>Vehicle's status has been Updated Successfully</span>
+                </span>,
+                "The Vehicle's status has been updated successfully.",
+              );
+            }
+          });
+
+          window.location.reload();
+          showNotification(
+            <span className='d-flex align-items-center'>
+              <Icon icon='Info' size='lg' className='me-1' />
+              <span>Vehicle's status has been  Updated Successfully</span>
+            </span>,
+            "The Vehicle's status has been updated successfully.",
+          );
+      }
+    })
+
+
+  }
+
   const searchByAssigned = (e) => {
     setAssigned(e.target.value);
 
@@ -106,9 +146,31 @@ const ListAllVehicles = () => {
 
       let assignedValue = e.target.value;
       let vehicleData = res.data;
+      console.log("vehicledata", vehicleData);
 
       if (assignedValue === 'All') {
         setVehicles(vehicleData);
+      } else if (assignedValue === 'Assigned') {
+        var vehicleResult = [];
+        vehicleData.map((veh) => {
+          if (veh.workersList.length != 0) {
+            vehicleResult.push(veh);
+          }
+        })
+        
+
+        setVehicles(vehicleResult);
+      }
+      else {
+        var vehicleResult = [];
+        vehicleData.map((veh) => {
+          if (veh.workersList.length == 0) {
+            vehicleResult.push(veh);
+          }
+        })
+        
+
+        setVehicles(vehicleResult);
       }
 
     });
@@ -175,17 +237,28 @@ const ListAllVehicles = () => {
                 </Button>
               </DropdownToggle>
               <DropdownMenu>
-                {Object.keys(EVENT_STATUS).map((key) => (
-                  <DropdownItem key={key}>
-                    <div>
-                      <Icon
-                        icon='Circle'
-                        color={EVENT_STATUS[key].color}
-                      />
-                      {EVENT_STATUS[key].name}
-                    </div>
-                  </DropdownItem>
-                ))}
+              <DropdownItem key='active' value='active'  >
+                  <Button
+                    isLink
+                    color='success'
+                    icon='Circle'
+                    value='active'
+                    onClick={changeStatus.bind(this, vehicle._id, "Active")}
+                    className='text-nowrap'>
+                    Active
+                  </Button>
+                </DropdownItem>
+                <DropdownItem key='inactive' value='inactive'  >
+                  <Button
+                    isLink
+                    color='danger'
+                    icon='Circle'
+                    value='inactive'
+                    onClick={changeStatus.bind(this, vehicle._id, "Inactive")}
+                    className='text-nowrap'>
+                    Inactive
+                  </Button>
+                </DropdownItem>
               </DropdownMenu>
             </Dropdown>
           </td>

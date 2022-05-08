@@ -39,6 +39,7 @@ import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Label from '../../../components/bootstrap/forms/Label';
 import Select from '../../../components/bootstrap/forms/Select';
 import CommonFilterTag from '../../common/CommonFilterTag';
+import showNotification from '../../../components/extras/showNotification';
 
 const ListAllJobsites = () => {
   const { themeStatus, darkModeStatus } = useDarkMode();
@@ -60,6 +61,7 @@ const ListAllJobsites = () => {
   const [assigned, setAssigned] = useState("All");
   const [assignedJobsites, setAssignedJobsites] = useState([]);
   const [users, setUsers] = useState([]);
+
 
   React.useEffect(() => {
     setLoading(true);
@@ -84,9 +86,55 @@ const ListAllJobsites = () => {
     console.log("Jobsite:", id);
   };
 
-  const changeStatus = (e) => {
-    e.preventDefault();
-    console.log("value changed", e.target.value);
+  const changeStatus = (id, value) => {
+
+    console.log("jobsite", id, "valye", value);
+    _.map(jobsites, (job) => {
+      if (job._id == id) {
+        const jobsiteObject = {
+          address: job.address,
+          ownerName: job.ownerName,
+          ownerEmail: job.ownerEmail,
+          ownerPhone: job.ownerPhone,
+          latitude: job.latitude,
+          longitude: job.longitude,
+          workOrderID: job.workOrderID,
+          workBudget: job.workBudget,
+          note: job.note,
+          stageOfWork: job.stageWork,
+          status: value,
+          workersList: job.workersList,
+          startDate: job.startDate,
+          endDate: job.endDate
+        };
+
+        console.log("jobsite to be updated", jobsiteObject);
+        axios
+          .put(`${BASE_URL}/api/jobsites/edit/${id}`, jobsiteObject)
+          .then((res) => {
+            if (res.status == 200) {
+              showNotification(
+                <span className='d-flex align-items-center'>
+                  <Icon icon='Info' size='lg' className='me-1' />
+                  <span>Jobsite's Status Updated Successfully</span>
+                </span>,
+                "The Jobsite's status has been updated successfully.",
+              );
+            }
+          });
+
+          window.location.reload();
+          showNotification(
+            <span className='d-flex align-items-center'>
+              <Icon icon='Info' size='lg' className='me-1' />
+              <span>Jobsite's Status Updated Successfully</span>
+            </span>,
+            "The Jobsite's status has been updated successfully.",
+          );
+      }
+    })
+
+
   }
   // // const { themeStatus, darkModeStatus } = useDarkMode();
   // const [currentPage, setCurrentPage] = useState(1);
@@ -104,6 +152,8 @@ const ListAllJobsites = () => {
     indexOfFirstJobsite,
     indexOfLastJobsite
   );
+
+  console.log("event status", EVENT_STATUS);
 
   if (currentJobsites.length === 0) {
     jobsiteTable = (
@@ -150,31 +200,45 @@ const ListAllJobsites = () => {
           <td>{jobsite.workOrderID}</td>
           <td>{jobsite.workBudget}</td>
           <td>{jobsite.stageOfWork}</td>
+
           <td>  {finalusers.map((usr) => <div> {usr} </div>)}</td>
           <td>
-            <Dropdown onChange={changeStatus}>
+            <Dropdown >
               <DropdownToggle hasIcon={false}>
                 <Button
                   isLink
                   color={jobsite.status == "Active" ? "success" : "danger"}
                   icon='Circle'
                   value={jobsite.status}
-                  className='text-nowrap' onChange={changeStatus}>
+                  className='text-nowrap'>
                   {jobsite.status}
                 </Button>
               </DropdownToggle>
-              <DropdownMenu>
-                {Object.keys(EVENT_STATUS).map((key) => (
-                  <DropdownItem key={key}>
-                    <div>
-                      <Icon
-                        icon='Circle'
-                        color={EVENT_STATUS[key].color}
-                      />
-                      {EVENT_STATUS[key].name}
-                    </div>
-                  </DropdownItem>
-                ))}
+              <DropdownMenu >
+
+                <DropdownItem key='active' value='active'  >
+                  <Button
+                    isLink
+                    color='success'
+                    icon='Circle'
+                    value='active'
+                    onClick={changeStatus.bind(this, jobsite._id, "Active")}
+                    className='text-nowrap'>
+                    Active
+                  </Button>
+                </DropdownItem>
+                <DropdownItem key='inactive' value='inactive'  >
+                  <Button
+                    isLink
+                    color='danger'
+                    icon='Circle'
+                    value='inactive'
+                    onClick={changeStatus.bind(this, jobsite._id, "Inactive")}
+                    className='text-nowrap'>
+                    Inactive
+                  </Button>
+                </DropdownItem>
+
               </DropdownMenu>
             </Dropdown>
           </td>
@@ -266,19 +330,24 @@ const ListAllJobsites = () => {
 
       if (assignedValue === 'All') {
         setJobsites(jobsiteData);
-      } else if (assignedValue === 'Unassigned') {
-        var jobsiteResult = _.filter(jobsiteData, ['workersList', '[]']);
-        console.log("unassigned", jobsiteResult);
+      } else if (assignedValue === 'Assigned') {
+        var jobsiteResult = [];
+        jobsiteData.map((job) => {
+          if (job.workersList.length != 0) {
+            jobsiteResult.push(job);
+          }
+        })
+        console.log("assigned", jobsiteResult);
 
         setJobsites(jobsiteResult);
       }
-      else  {
-        var jobsiteResult = jobsiteData.map((jobsite) => {
-          if (!jobsite.workersList) {
-            return jobsite;
+      else {
+        var jobsiteResult = [];
+        jobsiteData.map((job) => {
+          if (job.workersList.length == 0) {
+            jobsiteResult.push(job);
           }
-        });
-
+        })
         console.log("assigned", jobsiteResult);
 
         setJobsites(jobsiteResult);

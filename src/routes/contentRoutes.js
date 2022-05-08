@@ -38,6 +38,10 @@ const MATERIAL = {
   EDITMATERIAL: lazy(() => import('../pages/presentation/Material/EditMaterial')),
 }
 
+const PAYROLL = {
+	PAYSLIPS: lazy(() => import('../pages/presentation/Payroll/Payslips')),	
+  TIMESHEETS: lazy(() => import('../pages/presentation/Payroll/Timesheets')),
+}
 // const PAGE_LAYOUTS = {
 // 	HEADER_SUBHEADER: lazy(() => import('../pages/presentation/page-layouts/HeaderAndSubheader')),
 // 	HEADER: lazy(() => import('../pages/presentation/page-layouts/OnlyHeader')),
@@ -147,6 +151,16 @@ const presentation = [
   {
 		path: `${demoPages.Material.subMenu.editMaterial.path}/:id`,
 		element: <MATERIAL.EDITMATERIAL />,
+		exact: true,
+	},
+  {
+		path: demoPages.Payroll.subMenu.timesheets.path,
+		element: <PAYROLL.TIMESHEETS />,
+		exact: true,
+	},
+  {
+		path: demoPages.Payroll.subMenu.payslips.path,
+		element: <PAYROLL.PAYSLIPS />,
 		exact: true,
 	},
 

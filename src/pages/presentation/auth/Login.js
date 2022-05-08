@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import PropTypes from "prop-types";
 import { Link } from 'react-router-dom';
 import { connect } from "react-redux";
@@ -11,6 +11,7 @@ import Input from '../../../components/bootstrap/forms/Input';
 import Button from '../../../components/bootstrap/Button';
 import Logo from '../../../components/images/euro.jpg';
 import { loginUser } from "./actions/authActions";
+import demoPages, { dashboardMenu } from '../../../menu'
 
 
 class Login extends Component {
@@ -19,23 +20,28 @@ class Login extends Component {
     this.state = {
       username: "",
       password: "",
-      errors: {}
+      errors: {},
     };
 
     //this.onChange = this.onChange.bind(this);
     //this.onSubmit = this.onSubmit.bind(this);
   }
 
+
   componentDidMount() {
+
     console.log(this.props);
+
     if (this.props.auth.isAuthenticated) {
-      console.log("User is authenticated");
+      console.log("User is authenticated", this.props.auth);
+      this.props.history && console.log(this.props.history.push(dashboardMenu.dashboard.path));
     }
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.auth.isAuthenticated) {
-      console.log("User is authenticated");
+      console.log("authenticated");
+      this.props.history && this.props.history.push(dashboardMenu.dashboard.path);
     }
 
     if (nextProps.errors) {
@@ -121,24 +127,24 @@ class Login extends Component {
                       >
                         Login
                       </Button>
-                      <br/>
+                      <br />
                       <>
-											<div className='col-12 mt-3 text-center text-muted'>
-												OR
-											</div>
-											<div className='col-12 mt-3'>
-												<Button
-													
-													color='info'
-													className={classNames('w-100 py-3')}
-													icon='LockFill'
-											>
-													Forget Password
-												</Button>
-											</div>
+                        <div className='col-12 mt-3 text-center text-muted'>
+                          OR
+                        </div>
+                        <div className='col-12 mt-3'>
+                          <Button
+
+                            color='info'
+                            className={classNames('w-100 py-3')}
+                            icon='LockFill'
+                          >
+                            Forget Password
+                          </Button>
+                        </div>
                       </>
 
-                       
+
                     </div>
 
                   </form>
@@ -169,7 +175,8 @@ class Login extends Component {
 Login.propTypes = {
   loginUser: PropTypes.func.isRequired,
   auth: PropTypes.object.isRequired,
-  errors: PropTypes.object.isRequired
+  errors: PropTypes.object.isRequired,
+  history: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({

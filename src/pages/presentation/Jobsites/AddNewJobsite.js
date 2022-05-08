@@ -44,6 +44,9 @@ const AddNewUser = () => {
 
   const [redirect, setRedirect] = useState(false);
   const [eventItem, setEventItem] = useState(null);
+  const [jobsiteAddress, setAddress] = useState();
+  const [latitude, setLatitude] = useState();
+  const [longitude, setLongitude] = useState();
 
   const validate = (values) => {
     const errors = {};
@@ -62,9 +65,7 @@ const AddNewUser = () => {
       errors.ownerPhone = 'Required';
     }
 
-    if (!values.jobsiteAddress) {
-      errors.jobsiteAddress = 'Required';
-    }
+
 
     if (!values.quoteNumber) {
       errors.quoteNumber = 'Required';
@@ -75,8 +76,7 @@ const AddNewUser = () => {
     }
 
 
-    if(!values.workBudget)
-    {
+    if (!values.workBudget) {
       errors.workBudget = 'Required';
     }
 
@@ -85,14 +85,36 @@ const AddNewUser = () => {
 
 
 
+  const changeAddress = (e) => {
+    setAddress(e.target.value);
+    const options = {
+      method: "GET",
+      url: "https://forward-reverse-geocoding.p.rapidapi.com/v1/search",
+      params: {
+        q: e.target.value,
+        "accept-language": "en",
+        polygon_threshold: "0.0",
+      },
+      headers: {
+        "x-rapidapi-host": "forward-reverse-geocoding.p.rapidapi.com",
+        "x-rapidapi-key": "ea4507803bmsh28397e1ce8773a4p1c95e8jsn0fff31110b37",
+      },
+    };
+
+    axios.request(options).then((response) => {
+      console.log("Address Testing:", response.data);
+      setLatitude(response.data[0].lat);
+      setLongitude(response.data[0].lon);
+    });
+  }
 
 
   const formik = useFormik({
+
     initialValues: {
       ownerName: '',
       ownerEmail: '',
       ownerPhone: '',
-      jobsiteAddress: '',
       quoteNumber: '',
       stageWork: '',
       workBudget: '',
@@ -104,15 +126,15 @@ const AddNewUser = () => {
     validate,
     // eslint-disable-next-line no-unused-vars
     onSubmit: (values) => {
-  
+
 
       const jobsiteObject = {
-        address: values.jobsiteAddress,
+        address: jobsiteAddress,
         ownerName: values.ownerName,
         ownerEmail: values.ownerEmail,
         ownerPhone: values.ownerPhone,
-        latitude: values.latitude,
-        longitude: values.longitude,
+        latitude: latitude,
+        longitude: longitude,
         workOrderID: values.quoteNumber,
         workBudget: values.workBudget,
         note: values.note,
@@ -309,13 +331,11 @@ const AddNewUser = () => {
                       id='jobsiteAddress'
                       label='Address *'>
                       <Input
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        value={formik.values.jobsiteAddress}
-                        isValid={formik.isValid}
-                        isTouched={formik.touched.jobsiteAddress}
-                        invalidFeedback={formik.errors.jobsiteAddress}
-                        validFeedback='Looks good!'
+                        type="text"
+                        name="address"
+                        className="form-control"
+                        onChange={changeAddress}
+                        value={jobsiteAddress}
                       />
                     </FormGroup>
                     <FormGroup
@@ -323,16 +343,10 @@ const AddNewUser = () => {
                       id='latitude'
                       label='Latitude *'>
                       <Input
-                        onChange={formik.handleChange}
-                        isDisable="true"
-                        onBlur={formik.handleBlur}
-                        value={formik.values.latitude}
-                        isValid={formik.isValid}
-                        isTouched={formik.touched.latitude}
-                        invalidFeedback={
-                          formik.errors.latitude
-                        }
-                        validFeedback='Looks good!'
+                        type="text"
+                        name="latitude"
+                        className="form-control"
+                        value={latitude ? latitude : ""}
                       />
                     </FormGroup>
                     <FormGroup
@@ -340,19 +354,13 @@ const AddNewUser = () => {
                       id='longitude'
                       label='Longitude *'>
                       <Input
-                        onChange={formik.handleChange}
-                        isDisable="true"
-                        onBlur={formik.handleBlur}
-                        value={formik.values.longitude}
-                        isValid={formik.isValid}
-                        isTouched={formik.touched.longitude}
-                        invalidFeedback={
-                          formik.errors.longitude
-                        }
-                        validFeedback='Looks good!'
+                        type="text"
+                        name="latitude"
+                        className="form-control"
+                        value={longitude ? longitude : ""}
                       />
                     </FormGroup>
-                   
+
                     <FormGroup
                       className='col-lg-12'
                       id='note'
