@@ -1,6 +1,7 @@
 import React, { lazy } from 'react';
 import { dashboardMenu, demoPages } from '../menu';
 import Login from '../pages/presentation/auth/Login';
+import ForgetPassword from '../pages/presentation/auth/ForgetPassword';
 
 const LANDING = {
 	DASHBOARD: lazy(() => import('../pages/dashboard/DashboardPage')),
@@ -71,9 +72,9 @@ const presentation = [
 		element: <Login />,
 		exact: true,
 	},
-	{
-		path: demoPages.signUp.path,
-		element: <Login isSignUp />,
+  {
+		path: demoPages.forgetPassword.path,
+		element: <ForgetPassword />,
 		exact: true,
 	},
   {

@@ -10,24 +10,25 @@ import SubHeader, {
   SubHeaderRight,
   SubheaderSeparator,
 } from '../../../layout/SubHeader/SubHeader';
+import User from '../../../layout/User/User'
 
 const DefaultHeader = () => {
-	const deviceScreen = useDeviceScreen();
-	return (
-		<Header>
-       <SubHeader>
+  const deviceScreen = useDeviceScreen();
+  return (
+    <Header>
+      <SubHeader>
         <SubHeaderLeft>
-          <span className='h4 mb-0 fw-bold'>Dashboard</span>
-          <SubheaderSeparator />
+          
 
         </SubHeaderLeft>
         <SubHeaderRight>
-          Summary of all services
+          <CommonHeaderRight />
+          <User />
         </SubHeaderRight>
       </SubHeader>
-		
-		</Header>
-	);
+
+    </Header>
+  );
 };
 
 export default DefaultHeader;

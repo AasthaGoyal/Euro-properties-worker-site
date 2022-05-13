@@ -166,7 +166,7 @@ const ProductViewPage = () => {
 
 
   let demo = '';
-  
+
   _.map(jobsites, (job) => {
     if (job._id == jobsiteId) {
       console.log(job.address);
@@ -174,7 +174,7 @@ const ProductViewPage = () => {
     }
   });
 
-let finalusers = [];
+  let finalusers = [];
   workersId.map((wrk) => {
     _.map(users, (user) => {
       if (user._id == wrk) {
@@ -193,14 +193,23 @@ let finalusers = [];
         console.log(response.data);
         showNotification(
           <span className='d-flex align-items-center'>
-            <Icon icon='Info' size='lg' className='me-1' />
+            <Icon icon='EmojiSmile' size='lg' className='me-1' />
             <span>Task Deleted Successfully</span>
           </span>,
-          "The Task has been deleted successfully.",
+          "The Task has been deleted successfully.", 'warning'
         );
-    
+
       });
       setModal(!modal);
+    }).catch(err => {
+      console.log(err);
+      showNotification(
+        <span className='d-flex align-items-center'>
+          <Icon icon='EmojiAngry' size='lg' className='me-1' />
+          <span>Some error occured</span>
+        </span>,
+        "Some error occured. Please check the details or try again later.", 'danger'
+      );
     });
 
     //setSucess(true);
@@ -209,8 +218,7 @@ let finalusers = [];
     }, 3000);
   };
 
-  const onEditSubmit = (e) =>
-  {
+  const onEditSubmit = (e) => {
     e.preventDefault();
 
     const taskObject = {
@@ -225,24 +233,32 @@ let finalusers = [];
 
     console.log("the task to be updated is", taskObject);
     axios
-    .put(`${BASE_URL}/api/tasks/edit/${id}`, taskObject)
-    .then((res) => {
-      if(res.status == 200)
-      {
+      .put(`${BASE_URL}/api/tasks/edit/${id}`, taskObject)
+      .then((res) => {
+        if (res.status == 200) {
+          showNotification(
+            <span className='d-flex align-items-center'>
+              <Icon icon='EmojiSmile' size='lg' className='me-1' />
+              <span>Task Updated Successfully</span>
+            </span>,
+            "The Task has been updated successfully.", 'success'
+          );
+        }
+      }).catch(err => {
+        console.log(err);
         showNotification(
           <span className='d-flex align-items-center'>
-            <Icon icon='Info' size='lg' className='me-1' />
-            <span>Task Updated Successfully</span>
+            <Icon icon='EmojiAngry' size='lg' className='me-1' />
+            <span>Some error occured</span>
           </span>,
-          "The Task has been updated successfully.",
+          "Some error occured. Please check the details or try again later.", 'danger'
         );
-      }
-    });
+      });
 
 
   }
 
-console.log("Worker Assigns:", workersAssign);
+  console.log("Worker Assigns:", workersAssign);
 
   return (
     <PageWrapper title="Edit User">
@@ -281,11 +297,7 @@ console.log("Worker Assigns:", workersAssign);
         <SubHeaderRight>
 
 
-          {TABS.ACCOUNT_DETAIL === activeTab && (
-            <Button color='info' isOutline icon='Save' >
-              Save
-            </Button>
-          )}
+
 
         </SubHeaderRight>
       </SubHeader>
@@ -357,7 +369,7 @@ console.log("Worker Assigns:", workersAssign);
                           value={demo}
                         />
                       </FormGroup>
-                      <br/>
+                      <br />
                       <Picky
                         id="picky1"
                         options={jobs}
@@ -381,7 +393,7 @@ console.log("Worker Assigns:", workersAssign);
 
                     </div>
                     <div className='col-lg-12'>
-                    <FormGroup
+                      <FormGroup
                         className='col-lg-12'
                         id='workers'
                         label='Workers *'>
@@ -391,7 +403,7 @@ console.log("Worker Assigns:", workersAssign);
                           value={finalusers}
                         />
                       </FormGroup>
-                      <br/>
+                      <br />
                       <Picky
                         id="picky2"
                         placeholder="Worker(s) *"
@@ -403,11 +415,11 @@ console.log("Worker Assigns:", workersAssign);
                         onChange={(worker) => {
                           setWorkersList(worker)
                           console.log('Worker:', worker)
-  
+
                           let workerSelected = _.uniq(worker);
-  
+
                           let findUsers = [];
-  
+
                           _.map(workerSelected, (user) => {
                             let currentUser = _.filter(users, [
                               "username",
@@ -415,9 +427,9 @@ console.log("Worker Assigns:", workersAssign);
                             ]);
                             findUsers.push(currentUser[0]._id);
                           })
-  
+
                           let workerAssigns = _.uniq(findUsers);
-  
+
                           setWorkersAssign(workerAssigns)
                         }}
                         dropdownHeight={600}

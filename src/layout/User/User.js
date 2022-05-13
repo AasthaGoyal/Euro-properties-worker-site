@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import USERS from '../../common/data/userDummyData';
@@ -10,107 +10,88 @@ import { NavigationLine } from '../Navigation/Navigation';
 import Icon from '../../components/icon/Icon';
 import useNavigationItemHandle from '../../hooks/useNavigationItemHandle';
 import Popovers from '../../components/bootstrap/Popovers';
+import Dropdown, {
+  DropdownItem,
+  DropdownMenu,
+  DropdownToggle,
+} from '../../components/bootstrap/Dropdown';
+import Button from '../../components/bootstrap/Button';
+import { Link } from 'react-router-dom';
 
 const User = () => {
-	const navigate = useNavigate();
-	const handleItem = useNavigationItemHandle();
-	const { darkModeStatus, setDarkModeStatus } = useDarkMode();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const handleItem = useNavigationItemHandle();
 
-	const [collapseStatus, setCollapseStatus] = useState(false);
+  const { t } = useTranslation(['translation', 'menu']);
+  const user = location.state;
+  console.log(user);
 
-	const { t } = useTranslation(['translation', 'menu']);
+  const logoutUser = () => {
+    localStorage.removeItem('jwtToken');
 
-	return (
-		<>
-			<div
-				className={classNames('user', { open: collapseStatus })}
-				role='presentation'
-				onClick={() => setCollapseStatus(!collapseStatus)}>
-				<div className='user-avatar'>
-					<img
-						srcSet={USERS.JOHN.srcSet}
-						src={USERS.JOHN.src}
-						alt='Avatar'
-						width={128}
-						height={128}
-					/>
-				</div>
-				<div className='user-info'>
-					<div className='user-name'>
-						<Popovers title='User.js' desc={<code>src/layout/User/User.js</code>}>
-							User
-						</Popovers>
-						<code className='ps-2'>User.js</code>
-					</div>
-					<div className='user-sub-title'>
-						<Popovers title='User.js' desc={<code>src/layout/User/User.js</code>}>
-							User
-						</Popovers>
-						<code className='ps-2'>User.js</code>
-					</div>
-				</div>
-			</div>
 
-			<Collapse isOpen={collapseStatus} className='user-menu'>
-				<nav aria-label='aside-bottom-user-menu'>
-					<div className='navigation'>
-						<div
-							role='presentation'
-							className='navigation-item cursor-pointer'
-							onClick={() =>
-								navigate(
-									`../${demoPages.appointment.subMenu.employeeID.path}/${USERS.JOHN.id}`,
-									handleItem(),
-								)
-							}>
-							<span className='navigation-link navigation-link-pill'>
-								<span className='navigation-link-info'>
-									<Icon icon='AccountBox' className='navigation-icon' />
-									<span className='navigation-text'>{t('menu:Profile')}</span>
-								</span>
-							</span>
-						</div>
-						<div
-							role='presentation'
-							className='navigation-item cursor-pointer'
-							onClick={() => {
-								setDarkModeStatus(!darkModeStatus);
-								handleItem();
-							}}>
-							<span className='navigation-link navigation-link-pill'>
-								<span className='navigation-link-info'>
-									<Icon
-										icon={darkModeStatus ? 'DarkMode' : 'LightMode'}
-										color={darkModeStatus ? 'info' : 'warning'}
-										className='navigation-icon'
-									/>
-									<span className='navigation-text'>
-										{darkModeStatus ? t('menu:DarkMode') : t('menu:LightMode')}
-									</span>
-								</span>
-							</span>
-						</div>
-					</div>
-				</nav>
-				<NavigationLine />
-				<nav aria-label='aside-bottom-user-menu-2'>
-					<div className='navigation'>
-						<div
-							role='presentation'
-							className='navigation-item cursor-pointer'
-							onClick={() => navigate(`../${demoPages.login.path}`)}>
-							<span className='navigation-link navigation-link-pill'>
-								<span className='navigation-link-info'>
-									<Icon icon='Logout' className='navigation-icon' />
-									<span className='navigation-text'>{t('menu:Logout')}</span>
-								</span>
-							</span>
-						</div>
-					</div>
-				</nav>
-			</Collapse>
-		</>
-	);
+  }
+
+  return (
+    <>
+
+      <Dropdown >
+        <DropdownToggle hasIcon={false}>
+
+          <Button
+            icon='PersonCheck'
+            color='danger'
+            isLight data-tour='filter'>
+
+            Hello {user ? user.user.firstName : null}
+            <div className='user-sub-title'>{user ? user.user.userType : null}</div>
+
+
+          </Button>
+
+
+        </DropdownToggle>
+        <DropdownMenu isAlignmentEnd
+          size='sm'
+          isCloseAfterLeave={false}
+          data-tour='filter-menu'>
+
+          <DropdownItem   >
+
+            <Link to={`../${demoPages.UserPages.subMenu.editUser.path}/${user.id}`}>
+              <Button
+                isLink
+                color='success'
+                icon='AccountBox'
+                value='Profile'
+
+                className='text-nowrap'>
+                Profile
+              </Button>
+            </Link>
+
+          </DropdownItem>
+          <DropdownItem   >
+            <Link to={demoPages.login.path}>
+              <Button
+                isLink
+                color='info'
+                icon='Logout'
+                value='logout'
+                onClick={logoutUser}
+                className='text-nowrap'>
+                Logout
+              </Button>
+            </Link>
+          </DropdownItem>
+
+        </DropdownMenu>
+      </Dropdown>
+
+
+    </>
+  );
 };
 
 export default User;

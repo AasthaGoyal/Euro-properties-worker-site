@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useFormik } from 'formik';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
@@ -41,12 +41,16 @@ import {
   ModalFooter
 
 } from "reactstrap";
+import { useTimeout } from 'react-use';
 
 
 
 const ProductViewPage = () => {
   const { darkModeStatus } = useDarkMode();
+  const location = useLocation();
 
+  console.log(location.state);
+  
   const validateAddress = (values) => {
     const errors = {};
     if (!values.address) {
@@ -128,6 +132,7 @@ const ProductViewPage = () => {
   const setInfoEvent = () => setToggleInfoEventCanvas(!toggleInfoEventCanvas);
   const [events, setEvents] = useState([]);
 
+
   const formik = useFormik({
     initialValues: {
       userType: '',
@@ -169,13 +174,24 @@ const ProductViewPage = () => {
           if (res.status == 200) {
             showNotification(
               <span className='d-flex align-items-center'>
-                <Icon icon='Info' size='lg' className='me-1' />
+                <Icon icon='EmojiSmile' size='lg' className='me-1' />
                 <span>Updated Successfully</span>
               </span>,
-              "The user's account details have been successfully updated.",
+              "The user's account details have been successfully updated.", 'success'
             );
           }
+        }).catch(err => {
+          console.log(err);
+          showNotification(
+            <span className='d-flex align-items-center'>
+              <Icon icon='EmojiAngry' size='lg' className='me-1' />
+              <span>Some error occured</span>
+            </span>,
+            "Some error occured. Please check the details or try again later.", 'danger'
+          );
         });
+
+
 
     },
   });
@@ -213,12 +229,21 @@ const ProductViewPage = () => {
           if (res.status == 200) {
             showNotification(
               <span className='d-flex align-items-center'>
-                <Icon icon='Info' size='lg' className='me-1' />
+                <Icon icon='EmojiSmile' size='lg' className='me-1' />
                 <span>Address Updated Successfully</span>
               </span>,
-              "The user's address have been successfully updated.",
+              "The user's address have been successfully updated.", 'success'
             );
           }
+        }).catch(err => {
+          console.log(err);
+          showNotification(
+            <span className='d-flex align-items-center'>
+              <Icon icon='EmojiAngry' size='lg' className='me-1' />
+              <span>Some error occured</span>
+            </span>,
+            "Some error occured. Please check the details or try again later.", 'danger'
+          );
         });
 
 
@@ -265,12 +290,21 @@ const ProductViewPage = () => {
           if (res.status == 200) {
             showNotification(
               <span className='d-flex align-items-center'>
-                <Icon icon='Info' size='lg' className='me-1' />
+                <Icon icon='EmojiSmile' size='lg' className='me-1' />
                 <span>Account details Updated Successfully</span>
               </span>,
-              "The user's account details have been successfully updated.",
+              "The user's account details have been successfully updated.", 'success'
             );
           }
+        }).catch(err => {
+          console.log(err);
+          showNotification(
+            <span className='d-flex align-items-center'>
+              <Icon icon='EmojiAngry' size='lg' className='me-1' />
+              <span>Some error occured</span>
+            </span>,
+            "Some error occured. Please check the details or try again later.", 'danger'
+          );
         });
 
 
@@ -279,6 +313,7 @@ const ProductViewPage = () => {
 
 
   useEffect(() => {
+    console.log("user id is", id);
 
     axios
       .get(`${BASE_URL}/api/users/${id}`)
@@ -325,14 +360,23 @@ const ProductViewPage = () => {
         let users = response.data;
         showNotification(
           <span className='d-flex align-items-center'>
-            <Icon icon='Info' size='lg' className='me-1' />
+            <Icon icon='EmojiSmile' size='lg' className='me-1' />
             <span>Deleted Successfully</span>
           </span>,
-          "The user has been deleted successfully.",
+          "The user has been deleted successfully.", 'warning'
         );
 
-      });
+      })
       setModal(!modal);
+    }).catch(err => {
+      console.log(err);
+      showNotification(
+        <span className='d-flex align-items-center'>
+          <Icon icon='EmojiAngry' size='lg' className='me-1' />
+          <span>Some error occured</span>
+        </span>,
+        "Some error occured. Please check the details or try again later.", 'danger'
+      );
     });
 
     //setSucess(true);
@@ -385,29 +429,7 @@ const ProductViewPage = () => {
         <SubHeaderRight>
 
 
-          {TABS.ACCOUNT_DETAIL === activeTab && (
-            <Button color='info' isOutline icon='Save' onClick={formik.handleSubmit}>
-              Save
-            </Button>
-          )}
-          {TABS.ADDRESS === activeTab && (
-            <Button
-              color='info'
-              isOutline
-              icon='Save'
-              onClick={formikAddress.handleSubmit}>
-              Save
-            </Button>
-          )}
-          {TABS.BANK === activeTab && (
-            <Button
-              color='info'
-              isOutline
-              icon='Save'
-              onClick={formikAccount.handleSubmit}>
-              Save
-            </Button>
-          )}
+
         </SubHeaderRight>
       </SubHeader>
       <Page container='fluid'>
@@ -796,7 +818,7 @@ const ProductViewPage = () => {
                         label='Tax Rate'
                         isFloating>
                         <Input
-                        placeholder="23"
+                          placeholder="23"
                           onChange={formikAccount.handleChange}
                           onBlur={formikAccount.handleBlur}
                           value={formikAccount.values.tax}

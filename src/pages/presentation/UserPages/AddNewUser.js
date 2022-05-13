@@ -83,6 +83,11 @@ const AddNewUser = () => {
       errors.confirmPassword = 'Required';
     }
 
+    if(values.password == values.confirmPassword)
+    {
+      errors.confirmPassword = "The Password and Confirm Password doesn't match";
+    }
+
     return errors;
   };
 
@@ -142,15 +147,24 @@ const AddNewUser = () => {
 
           showNotification(
             <span className='d-flex align-items-center'>
-              <Icon icon='Info' size='lg' className='me-1' />
+              <Icon icon='EmojiSmile' size='lg' className='me-1' />
               <span>New User Added</span>
             </span>,
-            "The new user has been successfully added.",
+            "The new user has been successfully added.",'success'
           );
 
 
         }
-      }).catch(err => console.log(err));
+      }).catch(err => {
+        console.log(err);
+        showNotification(
+          <span className='d-flex align-items-center'>
+            <Icon icon='Warning' size='lg' className='me-1' />
+            <span>Some error occured</span>
+          </span>,
+          "Some error occured. Please check the details or try again later.",'danger'
+        );
+      });
 
 
     }

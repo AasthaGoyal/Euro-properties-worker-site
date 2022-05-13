@@ -101,12 +101,21 @@ const AddNewUser = () => {
       {
         showNotification(
           <span className='d-flex align-items-center'>
-            <Icon icon='Info' size='lg' className='me-1' />
+            <Icon icon='EmojiSmile' size='lg' className='me-1' />
             <span>New Task Added</span>
           </span>,
-          "The new task has been successfully added.",
+          "The new task has been successfully added.", 'success'
         );
       }
+    }).catch(err => {
+      console.log(err);
+      showNotification(
+        <span className='d-flex align-items-center'>
+          <Icon icon='EmojiAngry' size='lg' className='me-1' />
+          <span>Some error occured</span>
+        </span>,
+        "Some error occured. Please check the details or try again later.",'danger'
+      );
     });
 
    

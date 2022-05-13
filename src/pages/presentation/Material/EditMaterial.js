@@ -179,14 +179,23 @@ const ProductViewPage = () => {
         if (response.status == 200) {
           showNotification(
             <span className='d-flex align-items-center'>
-              <Icon icon='Info' size='lg' className='me-1' />
+              <Icon icon='EmojiSmile' size='lg' className='me-1' />
               <span>Material Deleted Successfully</span>
             </span>,
-            "The Material has been deleted successfully.",
+            "The Material has been deleted successfully.", 'warning'
           );
         }
 
         setModal(!modal);
+      }).catch(err => {
+        console.log(err);
+        showNotification(
+          <span className='d-flex align-items-center'>
+            <Icon icon='EmojiAngry' size='lg' className='me-1' />
+            <span>Some error occured</span>
+          </span>,
+          "Some error occured. Please check the details or try again later.",'danger'
+        );
       });
 
     //setSucess(true);
@@ -217,12 +226,21 @@ const ProductViewPage = () => {
       {
         showNotification(
           <span className='d-flex align-items-center'>
-            <Icon icon='Info' size='lg' className='me-1' />
+            <Icon icon='EmojiSmile' size='lg' className='me-1' />
             <span>Material Updated Successfully</span>
           </span>,
-          "The Material has been updated successfully.",
+          "The Material has been updated successfully.", 'success'
         );
       }
+    }).catch(err => {
+      console.log(err);
+      showNotification(
+        <span className='d-flex align-items-center'>
+          <Icon icon='EmojiAngry' size='lg' className='me-1' />
+          <span>Some error occured</span>
+        </span>,
+        "Some error occured. Please check the details or try again later.",'danger'
+      );
     });
 
   };
@@ -267,15 +285,6 @@ const ProductViewPage = () => {
 
 
 
-          {TABS.JOBSITE === activeTab && (
-            <Button
-              color='info'
-              isOutline
-              icon='Save'
-            >
-              Save
-            </Button>
-          )}
 
         </SubHeaderRight>
       </SubHeader>

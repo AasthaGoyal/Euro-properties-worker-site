@@ -132,12 +132,21 @@ const ProductViewPage = () => {
         if (res.status == 200) {
           showNotification(
             <span className='d-flex align-items-center'>
-              <Icon icon='Info' size='lg' className='me-1' />
+              <Icon icon='EmojiSmile' size='lg' className='me-1' />
               <span>Vehicle Assigned Successfully</span>
             </span>,
-            "The Vehicle has been assigned successfully.",
+            "The Vehicle has been assigned successfully.", 'success'
           );
         }
+      }).catch(err => {
+        console.log(err);
+        showNotification(
+          <span className='d-flex align-items-center'>
+            <Icon icon='EmojiAngry' size='lg' className='me-1' />
+            <span>Some error occured</span>
+          </span>,
+          "Some error occured. Please check the details or try again later.", 'danger'
+        );
       });
   }
 
@@ -159,12 +168,21 @@ const ProductViewPage = () => {
         if (res.status == 200) {
           showNotification(
             <span className='d-flex align-items-center'>
-              <Icon icon='Info' size='lg' className='me-1' />
+              <Icon icon='EmojiSmile' size='lg' className='me-1' />
               <span>Vehicle Updated Successfully</span>
             </span>,
-            "The Vehicle has been updated successfully.",
+            "The Vehicle has been updated successfully.", 'success'
           );
         }
+      }).catch(err => {
+        console.log(err);
+        showNotification(
+          <span className='d-flex align-items-center'>
+            <Icon icon='EmojiAngry' size='lg' className='me-1' />
+            <span>Some error occured</span>
+          </span>,
+          "Some error occured. Please check the details or try again later.", 'danger'
+        );
       });
 
   }
@@ -202,13 +220,22 @@ const ProductViewPage = () => {
         let vehicles = response.data;
         showNotification(
           <span className='d-flex align-items-center'>
-            <Icon icon='Info' size='lg' className='me-1' />
+            <Icon icon='EmojiSmile' size='lg' className='me-1' />
             <span>Deleted Successfully</span>
           </span>,
-          "The Jobsite has been deleted successfully.",
+          "The Jobsite has been deleted successfully.", 'warning'
         );
-      });
+      })
       setModal(!modal);
+    }).catch(err => {
+      console.log(err);
+      showNotification(
+        <span className='d-flex align-items-center'>
+          <Icon icon='EmojiAngry' size='lg' className='me-1' />
+          <span>Some error occured</span>
+        </span>,
+        "Some error occured. Please check the details or try again later.", 'danger'
+      );
     });
 
     //setSucess(true);
@@ -217,7 +244,7 @@ const ProductViewPage = () => {
     }, 3000);
   };
 
- 
+
 
   let workers = [];
   _.map(users, (user) => {
@@ -230,7 +257,7 @@ const ProductViewPage = () => {
   });
 
   let finalusers = [];
- 
+
 
   workersId && workersId.map((wrk) => {
     _.map(users, (user) => {
@@ -283,16 +310,7 @@ const ProductViewPage = () => {
         <SubHeaderRight>
 
 
-          {TABS.ACCOUNT_DETAIL === activeTab && (
-            <Button color='info' isOutline icon='Save' >
-              Save
-            </Button>
-          )}
-          {TABS.ASSIGN === activeTab && (
-            <Button color='info' isOutline icon='Save' >
-              Save
-            </Button>
-          )}
+    
 
         </SubHeaderRight>
       </SubHeader>

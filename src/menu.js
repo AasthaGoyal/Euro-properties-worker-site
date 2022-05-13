@@ -213,6 +213,12 @@ export const demoPages = {
 		path: '/',
 		icon: 'Login',
 	},
+  forgetPassword: {
+    id: 'forgetPassword',
+    text: 'Forget Password',
+    path:'/forget-password',
+    icon: 'Password'
+  },
 	signUp: {
 		id: 'signUp',
 		text: 'Sign Up',

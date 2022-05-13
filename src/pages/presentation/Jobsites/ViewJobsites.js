@@ -180,12 +180,21 @@ const ProductViewPage = () => {
           if (res.status == 200) {
             showNotification(
               <span className='d-flex align-items-center'>
-                <Icon icon='Info' size='lg' className='me-1' />
+                <Icon icon='EmojiSmile' size='lg' className='me-1' />
                 <span>Jobsite Updated Successfully</span>
               </span>,
-              "The Owner details have been successfully updated.",
+              "The Owner details have been successfully updated.", 'success'
             );
           }
+        }).catch(err => {
+          console.log(err);
+          showNotification(
+            <span className='d-flex align-items-center'>
+              <Icon icon='EmojiAngry' size='lg' className='me-1' />
+              <span>Some error occured</span>
+            </span>,
+            "Some error occured. Please check the details or try again later.", 'danger'
+          );
         });
 
 
@@ -233,12 +242,21 @@ const ProductViewPage = () => {
           if (res.status == 200) {
             showNotification(
               <span className='d-flex align-items-center'>
-                <Icon icon='Info' size='lg' className='me-1' />
+                <Icon icon='EmojiSmile' size='lg' className='me-1' />
                 <span>Jobsite Updated Successfully</span>
               </span>,
-              "The Jobsite details have been successfully updated.",
+              "The Jobsite details have been successfully updated.", 'success'
             );
           }
+        }).catch(err => {
+          console.log(err);
+          showNotification(
+            <span className='d-flex align-items-center'>
+              <Icon icon='EmojiAngry' size='lg' className='me-1' />
+              <span>Some error occured</span>
+            </span>,
+            "Some error occured. Please check the details or try again later.", 'danger'
+          );
         });
 
 
@@ -273,24 +291,25 @@ const ProductViewPage = () => {
     axios
       .put(`${BASE_URL}/api/jobsites/edit/${id}`, jobsiteObject)
       .then((res) => {
-        if(res.status == 200)
-        {
+        if (res.status == 200) {
           showNotification(
             <span className='d-flex align-items-center'>
-              <Icon icon='Info' size='lg' className='me-1' />
+              <Icon icon='EmojiSmile' size='lg' className='me-1' />
               <span>Jobsite Updated Successfully</span>
             </span>,
-            "The Jobsite has been updated successfully.",
+            "The Jobsite has been updated successfully.", 'success'
           );
         }
+      }).catch(err => {
+        console.log(err);
+        showNotification(
+          <span className='d-flex align-items-center'>
+            <Icon icon='EmojiAngry' size='lg' className='me-1' />
+            <span>Some error occured</span>
+          </span>,
+          "Some error occured. Please check the details or try again later.", 'danger'
+        );
       });
-    // showNotification(
-    //   <span className='d-flex align-items-center'>
-    //     <Icon icon='Success' size='lg' className='me-1' />
-    //     <span>Jobsite assigned to workers</span>
-    //   </span>,
-    //   "The Jobsite has been assigned successfully.",
-    // );
 
   }
 
@@ -305,13 +324,22 @@ const ProductViewPage = () => {
         let jobsites = response.data;
         showNotification(
           <span className='d-flex align-items-center'>
-            <Icon icon='Info' size='lg' className='me-1' />
+            <Icon icon='EmojiSmile' size='lg' className='me-1' />
             <span>Deleted Successfully</span>
           </span>,
-          "The Jobsite has been deleted successfully.",
+          "The Jobsite has been deleted successfully.", 'warning'
         );
       });
       setModal(!modal);
+    }).catch(err => {
+      console.log(err);
+      showNotification(
+        <span className='d-flex align-items-center'>
+          <Icon icon='EmojiAngry' size='lg' className='me-1' />
+          <span>Some error occured</span>
+        </span>,
+        "Some error occured. Please check the details or try again later.", 'danger'
+      );
     });
 
     //setSucess(true);
@@ -454,25 +482,7 @@ const ProductViewPage = () => {
         <SubHeaderRight>
 
 
-          {TABS.OWNER === activeTab && (
-            <Button color='info' isOutline icon='Save' onClick={formik.handleSubmit}>
-              Save
-            </Button>
-          )}
-          {TABS.JOBSITE === activeTab && (
-            <Button
-              color='info'
-              isOutline
-              icon='Save'
-              onClick={formikJobsite.handleSubmit}>
-              Save
-            </Button>
-          )}
-          {TABS.ASSIGN === activeTab && (
-            <Button color='info' isOutline icon='Save' >
-              Save
-            </Button>
-          )}
+
         </SubHeaderRight>
       </SubHeader>
       <Page container='fluid'>
@@ -659,11 +669,11 @@ const ProductViewPage = () => {
                         label='Address'
                         isFloating>
                         <Input
-                            type="text"
-                            name="address"
-                            className="form-control"
-                            onChange={changeAddress}
-                            value={jobsiteAddress}
+                          type="text"
+                          name="address"
+                          className="form-control"
+                          onChange={changeAddress}
+                          value={jobsiteAddress}
                         />
                       </FormGroup>
                     </div>
@@ -802,7 +812,7 @@ const ProductViewPage = () => {
                   <div className='row g-4'>
                     <div className='col-lg-12'>
 
-                      <FormGroup  label='Worker(s) *'>
+                      <FormGroup label='Worker(s) *'>
                         <Input
 
                           value={finalusers}

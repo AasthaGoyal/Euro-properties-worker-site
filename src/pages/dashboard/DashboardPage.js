@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from "axios";
 import { BASE_URL } from "../../actions/actionConstant";
 import classNames from 'classnames';
@@ -38,6 +38,7 @@ import useDarkMode from '../../hooks/useDarkMode';
 
 
 const DashboardPage = () => {
+  const location = useLocation();
   const [employees, setEmployees] = useState([]);
   const [jobsites, setJobsites] = useState([]);
   const [invoices, setInvoices] = useState([]);

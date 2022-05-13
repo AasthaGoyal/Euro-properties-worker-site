@@ -5,7 +5,7 @@ import jwt_decode from 'jwt-decode';
 
 import { GET_ERRORS, SET_CURRENT_USER } from './types';
 
-import {BASE_URL} from './actionConstant';
+import { BASE_URL } from './actionConstant';
 
 //const BASE_URL = "http://18.218.32.98:5000";
 
@@ -24,10 +24,14 @@ import {BASE_URL} from './actionConstant';
 
 // Login - Get User Token
 export const loginUser = userData => dispatch => {
+
+  console.log("logging in use", userData);
   axios
     .post(`${BASE_URL}/api/users/login`, userData)
     .then(res => {
-      
+      console.log(res.status);
+
+
       // Save to localStorage
       const { token } = res.data;
       // Set token to ls
@@ -37,18 +41,21 @@ export const loginUser = userData => dispatch => {
       // Decode token to get user data
       const decoded = jwt_decode(token);
       // Set current user
-      console.log(dispatch(setCurrentUser(decoded)));
+      dispatch(setCurrentUser(decoded));
+
+
+
+
     })
-    .catch(err =>
-      {
-        console.log(err);
-        dispatch({
-          type: GET_ERRORS,
-          payload: err.response.data
-        })
-  
-      }
-    
+    .catch(err => {
+      console.log("the error is", err);
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data
+      })
+
+    }
+
     );
 };
 

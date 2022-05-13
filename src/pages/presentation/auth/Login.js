@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
+import React, { useCallback, Component, useState } from 'react';
 import PropTypes from "prop-types";
-import { Link } from 'react-router-dom';
+import { useNavigate, useHistory, Link } from 'react-router-dom';
 import { connect } from "react-redux";
 import classNames from 'classnames';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
@@ -10,129 +10,154 @@ import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../components/bootstrap/forms/Input';
 import Button from '../../../components/bootstrap/Button';
 import Logo from '../../../components/images/euro.jpg';
-import { loginUser } from "./actions/authActions";
-import demoPages, { dashboardMenu } from '../../../menu'
+import { demoPages, dashboardMenu } from '../../../menu'
+import { loginUser } from "../../../layout/actions/authActions";
+import { useFormik, validateYupSchema } from 'formik';
+import showNotification from '../../../components/extras/showNotification';
+import Icon from '../../../components/icon/Icon';
 
+const Login = (props) => {
 
-class Login extends Component {
-  constructor() {
-    super();
-    this.state = {
-      username: "",
-      password: "",
-      errors: {},
-    };
+  const navigate = useNavigate();
+  const { errors, setErrors } = useState();
 
-    //this.onChange = this.onChange.bind(this);
-    //this.onSubmit = this.onSubmit.bind(this);
-  }
+  const validate = (values) => {
+    const errors = {};
 
-
-  componentDidMount() {
-
-    console.log(this.props);
-
-    if (this.props.auth.isAuthenticated) {
-      console.log("User is authenticated", this.props.auth);
-      this.props.history && console.log(this.props.history.push(dashboardMenu.dashboard.path));
-    }
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.auth.isAuthenticated) {
-      console.log("authenticated");
-      this.props.history && this.props.history.push(dashboardMenu.dashboard.path);
+    if (!values.username) {
+      errors.username = 'Required';
     }
 
-    if (nextProps.errors) {
-      this.setState({ errors: nextProps.errors });
+    if (!values.password) {
+      errors.password = 'Required';
     }
-  }
 
-  onSubmit = (e) => {
-    e.preventDefault();
-
-    const userData = {
-      username: this.state.username,
-      password: this.state.password,
-    };
-    console.log("user data is ", userData);
-
-    this.props.loginUser(userData);
+    return errors;
   };
+  const formik = useFormik({
 
-  onChange = (e) => {
-    this.setState({ [e.target.name]: e.target.value });
-  };
+    initialValues: {
+      username: '',
+      password: ''
 
-  render() {
+    },
+    validate,
+    // eslint-disable-next-line no-unused-vars
+    onSubmit: (values) => {
+
+      const userData = {
+        username: values.username,
+        password: values.password
+      }
+
+      console.log("request formed", userData);
+      props.loginUser(userData);
+      console.log("resl", props);
+
+      if (props.errors == null) {
+        console.log("authenticated", props);
+        navigate("/dashboard", {state: { user: props.auth.user }});
+      } else{
+        
+        showNotification(
+          <span className='d-flex align-items-center'>
+            <Icon icon='EmojiAngry' size='lg' className='me-1' />
+            <span>Invalid Username/password</span>
+          </span>,
+          "Those credentials didn't worked. Please change the username/password and try again.",'info'
+        );
+      }
+
+    }
+
+  });
+
+
+  return (
+
+    <PageWrapper
+      title='Login'
+      className={classNames('bg-danger')}>
+
+
+      <Page className='p-0'>
+        <div className='row h-100 align-items-center justify-content-center'>
+          <div className='col-xl-4 col-lg-6 col-md-8 shadow-3d-container'>
+            <Card className='shadow-3d-dark' data-tour='login-page' validate onSubmit={formik.handleSubmit} >
+              <CardBody>
+                <div className='text-center my-5'>
+                  <Link
+                    to='/'
+                    className={classNames(
+                      'text-decoration-none  fw-bold display-2 text-dark')}>
+                    <img src={Logo} alt="logo" width={200} />
+
+                  </Link>
+                </div>
+
+                <div className='text-center h1 fw-bold mt-5'>Welcome,</div>
+                <div className='text-center h4 text-muted mb-5'>Sign in to continue!</div>
+
+                <form className='row g-4'>
+
+                  <div className='col-12'>
+
+                    <FormGroup
+                      id='username'
+                      isFloating
+                      label='Your email or username'>
+                      <Input
+
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        value={formik.values.username}
+                        isValid={formik.isValid}
+                        isTouched={formik.touched.username}
+                        invalidFeedback={formik.errors.username}
+                        validFeedback='Looks good!'
 
 
 
-    return (
+                      />
+                    </FormGroup>
+                    <br />
+                    <FormGroup
+                      id='password'
+                      isFloating
+                      label='Password'>
+                      <Input
+                        type='password'
+                        placeholder="johns"
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        value={formik.values.password}
+                        isValid={formik.isValid}
+                        isTouched={formik.touched.password}
+                        invalidFeedback={formik.errors.password}
+                        validFeedback='Looks good!'
 
-      <PageWrapper
-        title='Login'
-        className={classNames('bg-danger')}>
-        <Page className='p-0'>
-          <div className='row h-100 align-items-center justify-content-center'>
-            <div className='col-xl-4 col-lg-6 col-md-8 shadow-3d-container'>
-              <Card className='shadow-3d-dark' data-tour='login-page'>
-                <CardBody>
-                  <div className='text-center my-5'>
-                    <Link
-                      to='/'
-                      className={classNames(
-                        'text-decoration-none  fw-bold display-2 text-dark')}>
-                      <img src={Logo} alt="logo" width={200} />
 
-                    </Link>
-                  </div>
 
-                  <div className='text-center h1 fw-bold mt-5'>Welcome,</div>
-                  <div className='text-center h4 text-muted mb-5'>Sign in to continue!</div>
 
-                  <form className='row g-4'>
 
-                    <div className='col-12'>
+                      />
+                    </FormGroup>
+                    <br />
+                    <Button
+                      type='submit' color='danger' icon='Login'
+                      isDisable={!formik.isValid && !!formik.submitCount}
+                      className='w-100 py-3'
 
-                      <FormGroup
-                        id='login-username'
-                        isFloating
-                        label='Your email or username'>
-                        <Input placeholder="Username"
-                          name="username"
-                          type="text"
-                          value={this.state.username}
-                          onChange={this.onChange} />
-                      </FormGroup>
-                      <br />
-                      <FormGroup
-                        id='login-password'
-                        isFloating
-                        label='Password'>
-                        <Input
-                          placeholder="Password"
-                          name="password"
-                          type="password"
-                          value={this.state.password}
-                          onChange={this.onChange}
-
-                        />
-                      </FormGroup>
-                      <br />
-                      <Button
-                        color='danger'
-                        className='w-100 py-3' onClick={this.onSubmit}
-                      >
-                        Login
-                      </Button>
-                      <br />
-                      <>
-                        <div className='col-12 mt-3 text-center text-muted'>
-                          OR
-                        </div>
-                        <div className='col-12 mt-3'>
+                    >
+                      Login
+                    </Button>
+                    <br />
+                    <>
+                      <div className='col-12 mt-3 text-center text-muted'>
+                        OR
+                      </div>
+                      <div className='col-12 mt-3'>
+                        <Link to={demoPages.forgetPassword.path}>
                           <Button
 
                             color='info'
@@ -141,34 +166,34 @@ class Login extends Component {
                           >
                             Forget Password
                           </Button>
-                        </div>
-                      </>
+                        </Link>
+                      </div>
+                    </>
 
 
-                    </div>
+                  </div>
 
-                  </form>
-                </CardBody>
-              </Card>
-              <div className='text-center'>
-                <a
-                  href='/'
-                  className={classNames('text-decoration-none me-3 link-dark')}>
-                  Privacy policy
-                </a>
-                <a
-                  href='/'
-                  className={classNames('link-light text-decoration-none link-dark')}>
-                  Terms of use
-                </a>
-              </div>
+                </form>
+              </CardBody>
+            </Card>
+            <div className='text-center'>
+              <a
+                href='/'
+                className={classNames('text-decoration-none me-3 link-dark')}>
+                Privacy policy
+              </a>
+              <a
+                href='/'
+                className={classNames('link-light text-decoration-none link-dark')}>
+                Terms of use
+              </a>
             </div>
           </div>
-        </Page>
-      </PageWrapper>
+        </div>
+      </Page>
+    </PageWrapper>
 
-    );
-  }
+  )
 }
 
 
@@ -176,7 +201,6 @@ Login.propTypes = {
   loginUser: PropTypes.func.isRequired,
   auth: PropTypes.object.isRequired,
   errors: PropTypes.object.isRequired,
-  history: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({

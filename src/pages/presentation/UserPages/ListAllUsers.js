@@ -21,7 +21,7 @@ import Dropdown, {
 import Icon from '../../../components/icon/Icon';
 
 import { demoPages } from '../../../menu';
-import { Link } from 'react-router-dom';
+import { Link , useLocation} from 'react-router-dom';
 import _ from "lodash";
 import axios from "axios";
 import { BASE_URL } from "../../../actions/actionConstant";
@@ -50,6 +50,7 @@ const ListAllUsers = () => {
   // const [userId, setUserId] = useState("");
 
   const [users, setUsers] = useState([]);
+  const location = useLocation();
   const [modal, setModal] = useState(false);
   const [userId, setUserId] = useState("");
   const [loading, setLoading] = useState(false);
@@ -58,9 +59,11 @@ const ListAllUsers = () => {
   const [perPage, setPerPage] = useState(PER_COUNT['5']);
   const [filteredUsertype, setFilteredUsertype] = useState("All");
 
+  console.log(location.state);
+  
   React.useEffect(() => {
     setLoading(true);
-    axios.get(`http://localhost:5000/api/users`).then((response) => {
+    axios.get(`${BASE_URL}/api/users`).then((response) => {
       setUsers(response.data);
 
     });
