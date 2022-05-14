@@ -10,38 +10,35 @@ const AUTH = {
 	PAGE_404: lazy(() => import('../pages/presentation/auth/Page404')),
 };
 const USER = {
-	NEWUSER: lazy(() => import('../pages/presentation/UserPages/AddNewUser')),
+
 	LISTUSERS: lazy(() => import('../pages/presentation/UserPages/ListAllUsers')),	
-  PRODUCTS_VIEW: lazy(() => import('../pages/presentation/UserPages/ViewUser')),
+  
 };
 
 const JOBSITE = {
-  NEWJOBSITE: lazy(() => import('../pages/presentation/Jobsites/AddNewJobsite')),
+ 
 	LISTJOBSITES: lazy(() => import('../pages/presentation/Jobsites/ListAllJobsites')),	
-  EDITJOBSITE: lazy(() => import('../pages/presentation/Jobsites/ViewJobsites')),
+  
 }
 
 const TASKS = {
-  NEWTASK: lazy(() => import('../pages/presentation/Tasks/AddNewTask')),
+  
 	LISTTASK: lazy(() => import('../pages/presentation/Tasks/ListAllTasks')),	
-  EDITTASK: lazy(() => import('../pages/presentation/Tasks/EditTasks')),
+  
 }
 
 const VEHICLES = {
-  NEWVEHICLE: lazy(() => import('../pages/presentation/Vehicles/AddNewVehicle')),
+  
 	LISTVEHICLE: lazy(() => import('../pages/presentation/Vehicles/ListAllVehicles')),	
-  EDITVEHICLE: lazy(() => import('../pages/presentation/Vehicles/EditVehicle')),
+  
 }
 
-const MATERIAL = {
-  NEWMATERIAL: lazy(() => import('../pages/presentation/Material/AddMaterial')),
-	LISTMATERIAL: lazy(() => import('../pages/presentation/Material/ListAllMaterials')),	
-  EDITMATERIAL: lazy(() => import('../pages/presentation/Material/EditMaterial')),
-}
 
 const PAYROLL = {
+  ADDTIMESHEET: lazy(() => import('../pages/presentation/Payroll/AddTimesheet')),	
 	PAYSLIPS: lazy(() => import('../pages/presentation/Payroll/Payslips')),	
   TIMESHEETS: lazy(() => import('../pages/presentation/Payroll/Timesheets')),
+  INVOICES: lazy(() => import('../pages/presentation/Invoices/ListInvoices')),
 }
 // const PAGE_LAYOUTS = {
 // 	HEADER_SUBHEADER: lazy(() => import('../pages/presentation/page-layouts/HeaderAndSubheader')),
@@ -63,107 +60,51 @@ const presentation = [
 		exact: true,
 	},
 	{
-		path: demoPages.page404.path,
+		path: "/auth-pages/404",
 		element: <AUTH.PAGE_404 />,
 		exact: true,
 	},
 	{
-		path: demoPages.login.path,
+		path: "/",
 		element: <Login />,
 		exact: true,
 	},
   {
-		path: demoPages.forgetPassword.path,
+		path:"/forget-password",
 		element: <ForgetPassword />,
 		exact: true,
 	},
   {
-		path: demoPages.UserPages.subMenu.listUsers.path,
-		element: <USER.LISTUSERS />,
+		path: demoPages.AddTimesheet.path,
+		element: < PAYROLL.ADDTIMESHEET/>,
 		exact: true,
 	},
-	{
-		path: demoPages.UserPages.subMenu.addUsers.path,
-		element: <USER.NEWUSER />,
+  {
+		path: demoPages.ViewTimesheets.path,
+		element: < PAYROLL.TIMESHEETS/>,
+		exact: true,
+	},
+  {
+		path: demoPages.viewInvoices.path,
+		element: < PAYROLL.INVOICES/>,
+		exact: true,
+	},
+  {
+		path: demoPages.ViewJobsites.path,
+		element: < JOBSITE.LISTJOBSITES/>,
+		exact: true,
+	},
+  {
+		path: demoPages.ViewTasks.path,
+		element: < TASKS.LISTTASK/>,
+		exact: true,
+	},
+  {
+		path: demoPages.ViewVehicles.path,
+		element: < VEHICLES.LISTVEHICLE/>,
 		exact: true,
 	},
 
-
-	{
-		path: `${demoPages.UserPages.subMenu.editUser.path}/:id`,
-		element: <USER.PRODUCTS_VIEW />,
-		exact: true,
-	},
-  {
-		path: demoPages.Jobsites.subMenu.addJobsite.path,
-		element: <JOBSITE.NEWJOBSITE />,
-		exact: true,
-	},
-  {
-		path: demoPages.Jobsites.subMenu.viewJobsite.path,
-		element: <JOBSITE.LISTJOBSITES />,
-		exact: true,
-	},
-  {
-		path: `${demoPages.Jobsites.subMenu.editJobsite.path}/:id`,
-		element: <JOBSITE.EDITJOBSITE />,
-		exact: true,
-	},
-  {
-		path: demoPages.Tasks.subMenu.addTasks.path,
-		element: <TASKS.NEWTASK />,
-		exact: true,
-	},
-  {
-		path: demoPages.Tasks.subMenu.viewTasks.path,
-		element: <TASKS.LISTTASK />,
-		exact: true,
-	},
-  {
-		path: `${demoPages.Tasks.subMenu.editTasks.path}/:id`,
-		element: <TASKS.EDITTASK />,
-		exact: true,
-	},
-  {
-		path: demoPages.Vehicle.subMenu.addVehicle.path,
-		element: <VEHICLES.NEWVEHICLE />,
-		exact: true,
-	},
-  {
-		path: demoPages.Vehicle.subMenu.viewVehicle.path,
-		element: <VEHICLES.LISTVEHICLE />,
-		exact: true,
-	},
-  {
-		path: `${demoPages.Vehicle.subMenu.editVehicle.path}/:id`,
-		element: <VEHICLES.EDITVEHICLE />,
-		exact: true,
-	},
-  {
-		path: demoPages.Material.subMenu.addMaterial.path,
-		element: <MATERIAL.NEWMATERIAL />,
-		exact: true,
-	},
-  {
-		path: demoPages.Material.subMenu.viewMaterial.path,
-		element: <MATERIAL.LISTMATERIAL />,
-		exact: true,
-	},
-  {
-		path: `${demoPages.Material.subMenu.editMaterial.path}/:id`,
-		element: <MATERIAL.EDITMATERIAL />,
-		exact: true,
-	},
-  {
-		path: demoPages.Payroll.subMenu.timesheets.path,
-		element: <PAYROLL.TIMESHEETS />,
-		exact: true,
-	},
-  {
-		path: demoPages.Payroll.subMenu.payslips.path,
-		element: <PAYROLL.PAYSLIPS />,
-		exact: true,
-	},
 
 
 

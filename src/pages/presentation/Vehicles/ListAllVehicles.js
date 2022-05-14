@@ -42,7 +42,7 @@ import CommonFilterTag from '../../common/CommonFilterTag';
 import Moment from "react-moment";
 import showNotification from '../../../components/extras/showNotification';
 
-const ListAllVehicles = () => {
+const ListAllVehicles = (props) => {
   const { themeStatus, darkModeStatus } = useDarkMode();
 
   const [vehicles, setVehicles] = useState([]);
@@ -59,7 +59,19 @@ const ListAllVehicles = () => {
 
   React.useEffect(() => {
     setLoading(true);
-    axios.get(`${BASE_URL}/api/vehicles`).then(res => setVehicles(res.data));
+    axios.get(`${BASE_URL}/api/vehicles`).then(res => {
+      let allvehicles = res.data;
+      let uservehicles = [];
+      allvehicles.map((vehicle) => {
+        vehicle.workersList && vehicle.workersList.map((worker) => {
+          if (worker == props.auth.user.id) {
+            uservehicles.push(vehicle);
+          }
+        })
+      })
+
+      setVehicles(uservehicles);
+    });
 
     axios.get(`${BASE_URL}/api/users`).then((res) => {
       setUsers(res.data);
@@ -98,7 +110,7 @@ const ListAllVehicles = () => {
 
   const changeStatus = (id, value) => {
 
-  
+
     _.map(vehicles, (vehicle) => {
       if (vehicle._id == id) {
         const vehicleObject = {
@@ -110,7 +122,7 @@ const ListAllVehicles = () => {
           status: value,
           workersList: vehicle.workersList
         };
-    
+
         axios
           .put(`${BASE_URL}/api/vehicles/edit/${id}`, vehicleObject)
           .then((res) => {
@@ -125,14 +137,14 @@ const ListAllVehicles = () => {
             }
           });
 
-          window.location.reload();
-          showNotification(
-            <span className='d-flex align-items-center'>
-              <Icon icon='Info' size='lg' className='me-1' />
-              <span>Vehicle's status has been  Updated Successfully</span>
-            </span>,
-            "The Vehicle's status has been updated successfully.",
-          );
+        window.location.reload();
+        showNotification(
+          <span className='d-flex align-items-center'>
+            <Icon icon='Info' size='lg' className='me-1' />
+            <span>Vehicle's status has been  Updated Successfully</span>
+          </span>,
+          "The Vehicle's status has been updated successfully.",
+        );
       }
     })
 
@@ -157,7 +169,7 @@ const ListAllVehicles = () => {
             vehicleResult.push(veh);
           }
         })
-        
+
 
         setVehicles(vehicleResult);
       }
@@ -168,7 +180,7 @@ const ListAllVehicles = () => {
             vehicleResult.push(veh);
           }
         })
-        
+
 
         setVehicles(vehicleResult);
       }
@@ -212,10 +224,11 @@ const ListAllVehicles = () => {
       return (
         <tr key={vehicle._id}>
           <td>
-            <Link to={`../${demoPages.Vehicle.subMenu.editVehicle.path}/${vehicle._id}`}>
-              {vehicle.vehicleName}
-            </Link>
+
+            {vehicle.vehicleName}
+
           </td>
+          P
 
           <td>{vehicle.vehicleNo}</td>
           <td><Moment format="DD/MM/YYYY" date={vehicle.registrationDate} /></td>
@@ -237,7 +250,7 @@ const ListAllVehicles = () => {
                 </Button>
               </DropdownToggle>
               <DropdownMenu>
-              <DropdownItem key='active' value='active'  >
+                <DropdownItem key='active' value='active'  >
                   <Button
                     isLink
                     color='success'
@@ -262,22 +275,7 @@ const ListAllVehicles = () => {
               </DropdownMenu>
             </Dropdown>
           </td>
-          <td>
-            <Link to={`../${demoPages.Vehicle.subMenu.editVehicle.path}/${vehicle._id}`}>
-              <Button
-                isOutline={!darkModeStatus}
-                color='dark'
-                isLight={darkModeStatus}
-                className={classNames('text-nowrap', {
-                  'border-light': !darkModeStatus,
-                })}
-                icon='Edit'>
-                Edit
-              </Button>
-            </Link>
-
-
-          </td>
+          
         </tr>
       );
     });

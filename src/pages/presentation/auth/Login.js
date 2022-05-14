@@ -15,6 +15,11 @@ import { loginUser } from "../../../layout/actions/authActions";
 import { useFormik, validateYupSchema } from 'formik';
 import showNotification from '../../../components/extras/showNotification';
 import Icon from '../../../components/icon/Icon';
+import axios from 'axios';
+import setAuthToken from '../../../layout/utils/setAuthToken';
+import jwt_decode from 'jwt-decode';
+
+import { BASE_URL } from '../../../actions/actionConstant';
 
 const Login = (props) => {
 
@@ -34,6 +39,10 @@ const Login = (props) => {
 
     return errors;
   };
+
+
+
+
   const formik = useFormik({
 
     initialValues: {
@@ -51,22 +60,57 @@ const Login = (props) => {
       }
 
       console.log("request formed", userData);
-      props.loginUser(userData);
-      console.log("resl", props);
+      axios
+        .post(`${BASE_URL}/api/users/login`, userData)
+        .then(res => {
+          if (res.status == 200) {
+            
+            // Save to localStorage
+            const { token } = res.data;
+            // Set token to ls
+            localStorage.setItem('jwtToken', token);
+            // Set token to Auth header
+            setAuthToken(token);
+            // Decode token to get user data
+            const decoded = jwt_decode(token);
+            
+            navigate("/dashboard", { state: { user: decoded } })
+            // Set current user
 
-      if (props.errors == null) {
-        console.log("authenticated", props);
-        navigate("/dashboard", {state: { user: props.auth.user }});
-      } else{
-        
-        showNotification(
-          <span className='d-flex align-items-center'>
-            <Icon icon='EmojiAngry' size='lg' className='me-1' />
-            <span>Invalid Username/password</span>
-          </span>,
-          "Those credentials didn't worked. Please change the username/password and try again.",'info'
-        );
-      }
+          } else {
+            console.log("Invaid");
+            showNotification(
+              <span className='d-flex align-items-center'>
+                <Icon icon='EmojiAngry' size='lg' className='me-1' />
+                <span>Invalid Username/password</span>
+              </span>,
+              "Those credentials didn't worked. Please change the username/password and try again.", 'info'
+            );
+          }
+        });
+
+
+
+
+
+
+
+
+      // console.log("resl", props);
+
+      // if (props.errors == null) {
+      //   console.log("authenticated", props);
+      //   navigate("/dashboard", {state: { user: props.auth.user }});
+      // } else{
+
+      //   showNotification(
+      //     <span className='d-flex align-items-center'>
+      //       <Icon icon='EmojiAngry' size='lg' className='me-1' />
+      //       <span>Invalid Username/password</span>
+      //     </span>,
+      //     "Those credentials didn't worked. Please change the username/password and try again.",'info'
+      //   );
+      // }
 
     }
 
@@ -157,7 +201,7 @@ const Login = (props) => {
                         OR
                       </div>
                       <div className='col-12 mt-3'>
-                        <Link to={demoPages.forgetPassword.path}>
+                        <Link to="/forget-password">
                           <Button
 
                             color='info'

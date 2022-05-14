@@ -46,6 +46,7 @@ const DashboardPage = () => {
   const [profit, setProfit] = useState(0);
   const [hoursWorked, setHoursWorked] = useState();
 
+  console.log("dashboard user", location.state);
 
   useEffect(() => {
     const fetchEmployees = async () => {

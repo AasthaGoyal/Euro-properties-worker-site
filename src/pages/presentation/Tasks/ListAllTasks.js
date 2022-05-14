@@ -26,7 +26,6 @@ import SubHeader, {
 } from '../../../layout/SubHeader/SubHeader';
 
 import { demoPages } from '../../../menu';
-import { Link } from 'react-router-dom';
 import _ from "lodash";
 import axios from "axios";
 import { BASE_URL } from "../../../actions/actionConstant";
@@ -42,7 +41,7 @@ import CommonFilterTag from '../../common/CommonFilterTag';
 import Moment from "react-moment";
 import showNotification from '../../../components/extras/showNotification';
 
-const ListAllTasks = () => {
+const ListAllTasks = (props) => {
   const { themeStatus, darkModeStatus } = useDarkMode();
 
   const [tasks, setTasks] = useState([]);
@@ -61,69 +60,45 @@ const ListAllTasks = () => {
 
     setLoading(true);
     axios.get(`${BASE_URL}/api/tasks`).then((res) => {
-      setTasks(res.data);
-      setLoading(false);
+      let tasks = res.data;
+      let usertasks = [];
+      tasks.map((task) => {
+        task.workersAssign && task.workersAssign.map((worker) => {
+          if (worker == props.auth.user.id) {
+            usertasks.push(task);
+          }
+        })
+      })
+      setTasks(usertasks);
+
     });
 
     axios.get(`${BASE_URL}/api/jobsites`).then((res) => {
-      setJobsites(res.data);
+      let jobs = res.data;
+      let userJobsites = [];
+      jobs.map((job) => {
+        job.workersList && job.workersList.map((worker) => {
+          if (worker == props.auth.user.id) {
+            userJobsites.push(job)
+          }
+        })
+
+      })
+      console.log("User jobsites", userJobsites);
+      setJobsites(userJobsites);
+
+
     });
 
     axios.get(`${BASE_URL}/api/users`).then((res) => {
       setUsers(res.data);
     });
+    setLoading(false);
   }, []);
 
-  const openModal = (id) => {
-    // setTaskId(id)
-    setModal(!modal);
-    setTaskId(id);
-    console.log("Task:", id);
-  };
-
-  const changeStatus = (id, value) => {
 
 
-    _.map(tasks, (task) => {
-      if (task._id == id) {
 
-        const taskObject = {
-          jobsite: task.jobsite,
-          taskTitle: task.taskTitle,
-          taskDescription: task.taskDescription,
-          startDate: task.startDate,
-          endDate: task.endDate,
-          workersAssign: task.workersAssign,
-          status: value,
-        };
-        
-        axios
-          .put(`${BASE_URL}/api/tasks/edit/${id}`, taskObject)
-          .then((res) => {
-            if (res.status == 200) {
-              showNotification(
-                <span className='d-flex align-items-center'>
-                  <Icon icon='Info' size='lg' className='me-1' />
-                  <span>Task's status Updated Successfully</span>
-                </span>,
-                "The Task's status has been updated successfully.",
-              );
-            }
-          });
-
-        window.location.reload();
-        showNotification(
-          <span className='d-flex align-items-center'>
-            <Icon icon='Info' size='lg' className='me-1' />
-            <span>Task's status Updated Successfully</span>
-          </span>,
-          "The Task's status has been updated successfully.",
-        );
-      }
-    })
-
-
-  }
   // // const { themeStatus, darkModeStatus } = useDarkMode();
   // const [currentPage, setCurrentPage] = useState(1);
 
@@ -185,9 +160,9 @@ const ListAllTasks = () => {
         <tr key={task._id}>
           <td>
 
-            <Link to={`../${demoPages.Tasks.subMenu.editTasks.path}/${task._id}`}>
-              {task.taskTitle}
-            </Link>
+
+            {task.taskTitle}
+
           </td>
           <td>{jobsiteList}</td>
           <td> {finalusers.map(worker => {
@@ -211,59 +186,18 @@ const ListAllTasks = () => {
 
 
           <td>
-            <Dropdown>
-              <DropdownToggle hasIcon={false}>
-                <Button
-                  isLink
-                  color={task.status == "Completed" ? "success" : "danger"}
-                  icon='Circle'
-                  value={task.status}
-                  className='text-nowrap' onChange={changeStatus}>
-                  {task.status}
-                </Button>
-              </DropdownToggle>
-              <DropdownMenu>
-                <DropdownItem key='completed' value='completed'  >
-                  <Button
-                    isLink
-                    color='success'
-                    icon='Circle'
-                    value='Completed'
-                    onClick={changeStatus.bind(this, task._id, "Completed")}
-                    className='text-nowrap'>
-                    Completed
-                  </Button>
-                </DropdownItem>
-                <DropdownItem key='pending' value='pending'  >
-                  <Button
-                    isLink
-                    color='danger'
-                    icon='Circle'
-                    value='Pending'
-                    onClick={changeStatus.bind(this, task._id, "Pending")}
-                    className='text-nowrap'>
-                    Pending
-                  </Button>
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-          </td>
-          <td>
-            <Link to={`../${demoPages.Tasks.subMenu.editTasks.path}/${task._id}`}>
-              <Button
-                isOutline={!darkModeStatus}
-                color='dark'
-                isLight={darkModeStatus}
-                className={classNames('text-nowrap', {
-                  'border-light': !darkModeStatus,
-                })}
-                icon='Edit'>
-                Edit
-              </Button>
-            </Link>
 
+            <Button
+              isLink
+              color={task.status == "Completed" ? "success" : "danger"}
+              icon='Circle'
+              value={task.status}
+              className='text-nowrap' >
+              {task.status}
+            </Button>
 
           </td>
+
 
         </tr>
       );

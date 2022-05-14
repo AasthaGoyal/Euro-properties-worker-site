@@ -17,21 +17,58 @@ import Dropdown, {
 } from '../../components/bootstrap/Dropdown';
 import Button from '../../components/bootstrap/Button';
 import { Link } from 'react-router-dom';
+import jwt_decode from 'jwt-decode';
+import PropTypes from "prop-types";
+import setAuthToken from '../utils/setAuthToken';
+import { GET_ERRORS, SET_CURRENT_USER } from '../actions/types';
+import { connect } from "react-redux";
 
-const User = () => {
+const User = (props) => {
   const location = useLocation();
   const navigate = useNavigate();
   const handleItem = useNavigationItemHandle();
 
   const { t } = useTranslation(['translation', 'menu']);
-  const user = location.state;
-  console.log(user);
 
-  const logoutUser = () => {
+
+
+  const user = props.auth;
+  console.log("currently", user);
+
+  // const logoutUser = () => {
+  //   localStorage.removeItem('jwtToken');
+
+  //   navigate("/");
+
+  // }
+  const logoutUser = ()  => {
+    // Remove token from localStorage
     localStorage.removeItem('jwtToken');
+    // Remove auth header for future requests
+    setAuthToken(false);
+    // Set current user to {} which will set isAuthenticated to false
+    setCurrentUser({});
+    navigate("/")
 
+  
+  };
 
+  const setCurrentUser = decoded => {
+    return {
+      type: SET_CURRENT_USER,
+      payload: decoded
+    };
+  };
+
+  const profile = () => {
+    const token = localStorage.getItem('jwtToken');
+
+    const decoded = jwt_decode(token);
+    console.log(user);
+    navigate(`/user-pages/editUsers/${user.user.id}`);
   }
+
+
 
   return (
     <>
@@ -59,31 +96,32 @@ const User = () => {
 
           <DropdownItem   >
 
-            <Link to={`../${demoPages.UserPages.subMenu.editUser.path}/${user.id}`}>
-              <Button
-                isLink
-                color='success'
-                icon='AccountBox'
-                value='Profile'
 
-                className='text-nowrap'>
-                Profile
-              </Button>
-            </Link>
+            <Button
+              isLink
+              color='success'
+              icon='AccountBox'
+              value='Profile'
+              onClick={profile}
+              className='text-nowrap'>
+              Profile
+            </Button>
+
+
 
           </DropdownItem>
           <DropdownItem   >
-            <Link to={demoPages.login.path}>
-              <Button
-                isLink
-                color='info'
-                icon='Logout'
-                value='logout'
-                onClick={logoutUser}
-                className='text-nowrap'>
-                Logout
-              </Button>
-            </Link>
+
+            <Button
+              isLink
+              color='info'
+              icon='Logout'
+              value='logout'
+              onClick={logoutUser}
+              className='text-nowrap'>
+              Logout
+            </Button>
+
           </DropdownItem>
 
         </DropdownMenu>
@@ -94,4 +132,15 @@ const User = () => {
   );
 };
 
-export default User;
+User.propTypes = {
+  auth: PropTypes.object.isRequired,
+  logoutUser: PropTypes.func.isRequired,
+};
+
+const mapStateToProps = (state) => ({
+  //
+  auth: state.auth,
+});
+
+export default connect(mapStateToProps)(User);
+

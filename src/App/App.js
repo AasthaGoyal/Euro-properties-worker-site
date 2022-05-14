@@ -17,9 +17,9 @@ import COLORS from '../common/data/enumColors';
 import { getOS } from '../helpers/helpers';
 import steps, { styles } from '../steps';
 
-import { setCurrentUser, logoutUser } from "../actions/authActions";
+import { setCurrentUser, logoutUser } from "../layout/actions/authActions";
 import jwt_decode from "jwt-decode";
-import setAuthToken from "../utils/setAuthToken";
+import setAuthToken from "../layout/utils/setAuthToken";
 import { Provider } from "react-redux";
 import store from "../store";
 
@@ -92,7 +92,7 @@ const App = () => {
 	});
 
 	//	Add paths to the array that you don't want to be "Aside".
-	const withOutAsidePages = [demoPages.login.path, demoPages.signUp.path];
+	const withOutAsidePages = ["/", "/forget-password"];
 
 	return (
     <Provider store={store}>

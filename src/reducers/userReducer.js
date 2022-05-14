@@ -5,7 +5,7 @@ import {
   EDIT_USER,
   DELETE_USER,
   USER_LOADING
-} from '../actions/types';
+} from '../layout/actions/types';
 
 const initialState = {
   users: [],

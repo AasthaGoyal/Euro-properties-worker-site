@@ -1,3 +1,4 @@
+
 export const homeMenu = {
 	intro: { id: 'intro', text: 'Intro', path: '#intro', icon: 'Vrpano', subMenu: null },
 	bootstrap: {
@@ -46,194 +47,56 @@ export const demoPages = {
 		text: 'Pages',
 		icon: 'Extension',
 	},
-	UserPages: {
-		id: 'users',
-		text: 'Users',
-		path: 'user-pages',
-		icon: 'Person',
-		subMenu: {
-      addUsers: {
-				id: 'addUsers',
-				text: 'Add New User',
-				path: 'user-pages/addUser',
-				icon: 'AddCircle',
-			},
-			listUsers: {
-				id: 'viewUsers',
-				text: 'View Users',
-				path: 'user-pages/viewUsers',
-				icon: 'EmojiPeople',
-			},
-      editUser: {
-				id: 'editUsers',
-				text: 'Edit Users',
-				path: 'user-pages/editUsers',
-				icon: 'EmojiPeople',
-			},
-			
-  
-		},
+	AddTimesheet: {
+		id: 'addTime',
+		text: 'Add Time',
+		path: 'add-time',
+		icon: 'Calendar3',
+		subMenu: null
 	},
-	Jobsites: {
-		id: 'jobsites',
-		text: 'Job sites',
-		path: 'job-sites',
+	ViewTimesheets: {
+		id: 'viewTimesheets',
+		text: 'My Timesheets',
+		path: 'view-timesheets',
+		icon: 'Clock',
+    subMenu: null
+    
+	},
+	ViewJobsites: {
+		id: 'viewJobsites',
+		text: 'My Jobsites',
+		path: 'view-jobsites',
 		icon: 'Business',
-		subMenu: {
-			addJobsite: {
-				id: 'addJobsites',
-				text: 'Add Jobsite',
-				path: 'job-sites/AddNewJobsite',
-				icon: 'AddBox',
-			},
-			viewJobsite: {
-				id: 'viewJobsites',
-				text: 'View Jobsite',
-				path: 'job-sites/ListAllJobsites',
-				icon: 'Build',
-			},
-      editJobsite: {
-        id: 'editJobsites',
-				text: 'Edit Jobsite',
-				path: 'job-sites/editJobsite',
-				icon: 'Build',
-      }
-      
-		},
+    subMenu: null
 	},
-	Tasks: {
-		id: 'tasks',
-		text: 'Tasks',
-		path: 'task-pages',
+  ViewTasks: {
+		id: 'viewTasks',
+		text: 'My Tasks',
+		path: 'view-tasks',
 		icon: 'Task',
-    subMenu: {
-			addTasks: {
-				id: 'addTasks',
-				text: 'Add Task',
-				path: 'task-pages/AddNewTask',
-				icon: 'Tools',
-			},
-			viewTasks: {
-				id: 'viewTasks',
-				text: 'View Task',
-				path: 'task-pages/ListAllTasks',
-				icon: 'CheckAll',
-			},
-      editTasks: {
-        id: 'editTasks',
-				text: 'Edit Task',
-				path: 'task-pages/EditTasks',
-				icon: 'Task',
-      }
-      
-		},
+    subMenu: null
 	},
-	Vehicle: {
-		id: 'vehicle',
-		text: 'Vehicles',
-		path: 'vehicle-pages',
-		icon: 'Train ',
-		subMenu: {
-			addVehicle: {
-				id: 'addVehicle',
-				text: 'Add Vehicle',
-				path: 'vehicle-pages/addVehicle',
-				icon: 'AddLocation',
-			},
-			viewVehicle: {
-				id: 'viewVehicle',
-				text: 'View Vehicle',
-				path: 'vehicle-pages/viewVehicle',
-				icon: 'TaxiAlert',
-			},
-      editVehicle: {
-        id: 'editVehicle',
-				text: 'Edit Vehicle',
-				path: 'vehicle-pages/editVehicle',
-				icon: 'TaxiAlert',
-      }
-		},
+  ViewVehicles: {
+		id: 'viewVehicles',
+		text: 'My Vehicles',
+		path: 'view-vehicles',
+		icon: 'Train',
+    subMenu: null
 	},
-	Material: {
-		id: 'material',
-		text: 'Materials',
-		path: 'material-pages',
-		icon: 'Palette',
-		subMenu: {
-			addMaterial: {
-				id: 'addMaterial',
-				text: 'Add Material',
-				path: 'material-pages/addMaterial',
-				icon: 'PaintBucket',
-			},
-			viewMaterial: {
-				id: 'viewMaterial',
-				text: 'View Material',
-				path: 'material-pages/viewMaterial',
-				icon: 'BrushFill',
-			},
-      editMaterial: {
-        id: 'editMaterial',
-				text: 'Edit Material',
-				path: 'material-pages/editMaterial',
-				icon: 'BrushFill',
-      }
-		},
+  viewInvoices: {
+		id: 'viewInvoices',
+		text: 'My Invoices',
+		path: 'view-invoices',
+		icon: 'CurrencyDollar',
+    subMenu: null
 	},
-  Payroll: {
-		id: 'payroll',
-		text: 'Employee Payroll',
-		path: 'payroll-pages',
-		icon: 'PointOfSale',
-		subMenu: {
-			payslips: {
-				id: 'payslips',
-				text: 'Payslips',
-				path: 'payroll-pages/payslips',
-				icon: 'CashCoin',
-			},
-      timesheets: {
-        id: 'timesheets',
-				text: 'Timesheets',
-				path: 'payroll-pages/timesheets',
-				icon: 'Calendar3',
-      }
-		},
+  viewPaymentHistory: {
+		id: 'viewPaymentHistory',
+		text: 'My Payment History',
+		path: 'view-payment-history',
+		icon: 'CashCoin',
+    subMenu: null
 	},
-
-
-	auth: {
-		id: 'auth',
-		text: 'Auth Pages',
-		icon: 'Extension',
-	},
-	login: {
-		id: 'login',
-		text: 'Login',
-		path: '/',
-		icon: 'Login',
-	},
-  forgetPassword: {
-    id: 'forgetPassword',
-    text: 'Forget Password',
-    path:'/forget-password',
-    icon: 'Password'
-  },
-	signUp: {
-		id: 'signUp',
-		text: 'Sign Up',
-		path: 'auth-pages/sign-up',
-		icon: 'PersonAdd',
-	},
-
-	page404: {
-		id: 'Page404',
-		text: '404 Page',
-		path: 'auth-pages/404',
-		icon: 'ReportGmailerrorred',
-	},
-
-
 
 };
 
