@@ -30,6 +30,7 @@ import _ from "lodash";
 
 import { demoPages } from '../../menu';
 import useDarkMode from '../../hooks/useDarkMode';
+import jwt_decode from 'jwt-decode';
 
 
 // eslint-disable-next-line react/prop-types
@@ -39,6 +40,10 @@ import useDarkMode from '../../hooks/useDarkMode';
 
 const DashboardPage = () => {
   const location = useLocation();
+  const token = localStorage.getItem('jwtToken');
+
+  const decoded = jwt_decode(token);
+  const user = decoded;
   const [employees, setEmployees] = useState([]);
   const [jobsites, setJobsites] = useState([]);
   const [invoices, setInvoices] = useState([]);
@@ -46,57 +51,65 @@ const DashboardPage = () => {
   const [profit, setProfit] = useState(0);
   const [hoursWorked, setHoursWorked] = useState();
 
+  const [userjobsites, setUserJobsite] = useState(0);
+
   console.log("dashboard user", location.state);
 
   useEffect(() => {
-    const fetchEmployees = async () => {
-      const res = await axios.get(`${BASE_URL}/api/employees`);
-      setEmployees(res.data);
-    };
 
-    fetchEmployees();
 
-    const fetchJobsites = async () => {
-      const res = await axios.get(`${BASE_URL}/api/jobsites`);
-      setJobsites(res.data);
-      let jobsites = res.data;
-      let grossEarning = _.sumBy(jobsites, 'workBudget');
-      setGrossEarning(grossEarning)
+    axios.get(`${BASE_URL}/api/jobsites`)
+      .then((res) => {
+        let userJobsites = 0;
+        let allJobsites = res.data;
 
-      axios.get(`${BASE_URL}/api/employeeTimesheetFinal`).then((res) => {
-        let timesheet = res.data;
-        let hoursWorked = _.sumBy(timesheet, 'totalWorkHours');
-        setHoursWorked(hoursWorked);
-        let workedPayment = _.sumBy(timesheet, 'totalWorkerAmount')
-
-        axios.get(`${BASE_URL}/api/jobsitesmaterialpurchases`).then((res) => {
-          let material = res.data;
-
-          let totalMaterial = _.sumBy(material, 'totalCost');
-
-          let totalExtra = workedPayment + totalMaterial;
-
-          let profit = grossEarning - totalExtra;
-
-          setProfit(profit)
-
+        allJobsites.map((jobsite) => {
+          jobsite.workersList.map((worker) => {
+            if (worker == user.id) {
+              userJobsites = userJobsites + 1;
+            }
+          })
         });
+        setUserJobsite(userJobsites);
+
+        let grossEarning = _.sumBy(allJobsites, 'workBudget');
+        setGrossEarning(grossEarning)
+
+        axios.get(`${BASE_URL}/api/employeeTimesheetFinal`).then((res) => {
+          let timesheet = res.data;
+          let hoursWorked = _.sumBy(timesheet, 'totalWorkHours');
+          setHoursWorked(hoursWorked);
+          let workedPayment = _.sumBy(timesheet, 'totalWorkerAmount')
+
+          allJobsites.map((job) => {
+            job.workersList.map((worker) => {
+              if (worker == user) {
+                userJobsites = userJobsites + 1;
+              }
+            })
+          })
+        })
+        setJobsites(userJobsites);
+
+
+
 
       });
 
 
+    axios.get(`${BASE_URL}/api/workerinvoices`).then((res) => {
+      let workerInvoices = res.data;
+
+      let invoices = _.filter(workerInvoices, [
+        "employee",
+        user.id,
+      ]);
+
+      console.log("employee invoices", invoices, user.id);
+      setInvoices(invoices);
+    });
 
 
-    };
-
-    fetchJobsites();
-
-    const fetchInvoices = async () => {
-      const res = await axios.get(`${BASE_URL}/api/workerinvoices`);
-      setInvoices(res.data);
-    };
-
-    fetchInvoices();
 
 
   }, []);
@@ -106,136 +119,20 @@ const DashboardPage = () => {
   const { darkModeStatus } = useDarkMode();
 
   const navigate = useNavigate();
-  const handleOnClickToEmployeeListPage = useCallback(
-    () => navigate(`../${demoPages.UserPages.subMenu.listUsers.path}`),
+  const jobsitePage = useCallback(
+    () => navigate(`../${demoPages.ViewJobsites.path}`),
     [navigate],
   );
 
-  const TABS = {
-    WEEKLY: 'Weekly',
-    MONTHLY: 'Monthly',
-    YEARLY: 'Yearly',
-  };
-  const [activeTab] = useState(TABS.YEARLY);
+  const invoicePage = useCallback(
+    () => navigate(`../${demoPages.ListInvoices.path}`),
+    [navigate],
+  );
 
-  const [sales, setSales] = useState({
-    series: [
-      {
-        data: [34, 32, 36, 34, 34],
-      },
-    ],
-    options: {
-      colors: [process.env.REACT_APP_WARNING_COLOR],
-      chart: {
-        type: 'line',
-        width: '100%',
-        height: 150,
-        sparkline: {
-          enabled: true,
-        },
-      },
-      tooltip: {
-        theme: 'dark',
-        fixed: {
-          enabled: false,
-        },
-        x: {
-          show: false,
-        },
-        y: {
-          title: {
-            // eslint-disable-next-line no-unused-vars
-            formatter(seriesName) {
-              return '';
-            },
-          },
-        },
-      },
-      stroke: {
-        curve: 'smooth',
-        width: 2,
-      },
-    },
-    sales: {
-      compare: 24,
-    },
-    campaigns: {
-      price: 3265.72,
-      compare: 5000,
-    },
-    coupons: {
-      price: 2654.2,
-      compare: 2300,
-    },
-  });
-  useEffect(() => {
-    if (activeTab === TABS.YEARLY) {
-      setSales({
-        series: [
-          {
-            data: [34, 32, 36, 34, 34],
-          },
-        ],
-        sales: {
-          compare: 24,
-        },
-        campaigns: {
-          price: 3265.72,
-          compare: 5000,
-        },
-        coupons: {
-          price: 2654.2,
-          compare: 2300,
-        },
-        options: sales.options,
-      });
-    }
-    if (activeTab === TABS.MONTHLY) {
-      setSales({
-        series: [
-          {
-            data: [32, 35, 40, 30, 32],
-          },
-        ],
-        sales: {
-          compare: 27,
-        },
-        campaigns: {
-          price: 450,
-          compare: 480,
-        },
-        coupons: {
-          price: 98,
-          compare: 120,
-        },
-        options: sales.options,
-      });
-    }
-    if (activeTab === TABS.WEEKLY) {
-      setSales({
-        series: [
-          {
-            data: [28, 32, 30, 29, 30],
-          },
-        ],
-        sales: {
-          compare: 12,
-        },
-        campaigns: {
-          price: 94,
-          compare: 80,
-        },
-        coupons: {
-          price: 80,
-          compare: 45,
-        },
-        options: sales.options,
-      });
-    }
-    return () => { };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab]);
-
+  const payslipsPage = useCallback(
+    () => navigate(`../${demoPages.ListPayslips.path}`),
+    [navigate],
+  );
 
 
 
@@ -249,7 +146,7 @@ const DashboardPage = () => {
 
         </SubHeaderLeft>
         <SubHeaderRight>
-          Summary of all services
+          Your work summary
         </SubHeaderRight>
       </SubHeader>
       <Page container='fluid'>
@@ -281,90 +178,7 @@ const DashboardPage = () => {
 							color={USERS.SAM.color}
 						/>
 					</div> */}
-          <div className='col-xl-4'>
-            <Card className={classNames(
-              'transition-base rounded-2 mb-4 text-dark',
-              'bg-l25-secondary bg-l10-secondary-hover'
-            )}
-              shadow='sm'>
-              <CardHeader className='bg-transparent'>
-                <CardLabel icon='People' iconColor='danger'>
-                  <CardTitle tag='h4' className='h5'>
-                    Employees
-                  </CardTitle>
-                  <CardSubTitle tag='h5' className='h6 text-muted'>
-                    Number of current active/inactive employees
-                  </CardSubTitle>
-                </CardLabel>
-                <CardActions>
-                  <Button
-                    icon='ArrowForwardIos'
-                    aria-label='Read More'
-                    hoverShadow='default'
-                    color={darkModeStatus ? 'dark' : null}
-                    onClick={handleOnClickToEmployeeListPage}
-                  />
-                </CardActions>
-              </CardHeader>
-              <CardBody>
 
-                <div className='d-flex align-items-center pb-3'>
-
-                  <div className='flex-grow-1 ms-3'>
-                    <div className='fw-bold fs-3 mb-0'>
-                      {employees.length}
-                    </div>
-                    <div
-                      className={classNames({
-                        'text-muted': !darkModeStatus,
-                        'text-light': darkModeStatus,
-                      })}>
-                      total employees
-                    </div>
-                  </div>
-                </div>
-                {/* <AvatarGroup>
-									<Avatar
-										srcSet={USERS.GRACE.srcSet}
-										src={USERS.GRACE.src}
-										userName={`${USERS.GRACE.name} ${USERS.GRACE.surname}`}
-										color={USERS.GRACE.color}
-									/>
-									<Avatar
-										srcSet={USERS.SAM.srcSet}
-										src={USERS.SAM.src}
-										userName={`${USERS.SAM.name} ${USERS.SAM.surname}`}
-										color={USERS.SAM.color}
-									/>
-									<Avatar
-										srcSet={USERS.CHLOE.srcSet}
-										src={USERS.CHLOE.src}
-										userName={`${USERS.CHLOE.name} ${USERS.CHLOE.surname}`}
-										color={USERS.CHLOE.color}
-									/>
-
-									<Avatar
-										srcSet={USERS.JANE.srcSet}
-										src={USERS.JANE.src}
-										userName={`${USERS.JANE.name} ${USERS.JANE.surname}`}
-										color={USERS.JANE.color}
-									/>
-									<Avatar
-										srcSet={USERS.JOHN.srcSet}
-										src={USERS.JOHN.src}
-										userName={`${USERS.JOHN.name} ${USERS.JOHN.surname}`}
-										color={USERS.JOHN.color}
-									/>
-									<Avatar
-										srcSet={USERS.RYAN.srcSet}
-										src={USERS.RYAN.src}
-										userName={`${USERS.RYAN.name} ${USERS.RYAN.surname}`}
-										color={USERS.RYAN.color}
-									/>
-								</AvatarGroup> */}
-              </CardBody>
-            </Card>
-          </div>
           <div className='col-xl-4'>
             <Card className={classNames(
               'transition-base rounded-2 mb-0 text-dark',
@@ -386,16 +200,17 @@ const DashboardPage = () => {
                     aria-label='Read More'
                     hoverShadow='default'
                     color={darkModeStatus ? 'dark' : null}
-                    onClick={handleOnClickToEmployeeListPage}
+                    onClick={jobsitePage}
                   />
                 </CardActions>
+
               </CardHeader>
               <CardBody>
                 <div className='d-flex align-items-center pb-3'>
 
                   <div className='flex-grow-1 ms-3'>
                     <div className='fw-bold fs-3 mb-0'>
-                      {jobsites.length}
+                      {userjobsites}
                     </div>
                     <div
                       className={classNames({
@@ -431,9 +246,10 @@ const DashboardPage = () => {
                     aria-label='Read More'
                     hoverShadow='default'
                     color={darkModeStatus ? 'dark' : null}
-                    onClick={handleOnClickToEmployeeListPage}
+                    onClick={invoicePage}
                   />
                 </CardActions>
+
               </CardHeader>
               <CardBody>
                 <div className='d-flex align-items-center pb-3'>
@@ -455,91 +271,8 @@ const DashboardPage = () => {
             </Card>
           </div>
 
-          <div className='col-xxl-4'>
-            <Card className={classNames(
-              'transition-base rounded-2 mb-0 text-dark',
-              'bg-l25-info bg-l10-info-hover'
-            )}
-              stretch
-              shadow='sm'>
-              <CardHeader className='bg-transparent'>
-                <CardLabel icon='ReceiptLong'>
-                  <CardTitle tag='h4' className='h5'>
-                    Gross Revenue
-                  </CardTitle>
-                  <CardSubTitle tag='h5' className='h6 text-muted'>
-                    Overall Gross revenue
-                  </CardSubTitle>
-                </CardLabel>
 
-              </CardHeader>
-              <CardBody>
-              <div className='d-flex align-items-center pb-3'>
-													<div className='flex-shrink-0'>
-														<Icon
-															icon='AttachMoney'
-															size='4x'
-															color='warning'
-														/>
-													</div>
-													<div className='flex-grow-1 ms-3'>
-														<div className='fw-bold fs-3 mb-0'>
-															{grossEarning}
-														
-														</div>
-														<div
-															className={classNames({
-																'text-muted': !darkModeStatus,
-																'text-light': darkModeStatus,
-															})}>
-														Total Gross Revenue
-														</div>
-													</div>
-												</div>
-              </CardBody>
-            </Card>
-          </div>
-          <div className='col-xxl-4'>
-            <Card className={classNames(
-              'transition-base rounded-2 mb-0 text-dark',
-              'bg-l25-danger bg-l10-danger-hover'
-            )}
-              stretch
-              shadow='sm'>
-              <CardHeader className='bg-transparent'>
-                <CardLabel icon='Stack' iconColor='danger'>
-                  <CardTitle tag='h4' className='h5'>
-                    Profit Revenue
-                  </CardTitle>
-                  <CardSubTitle>Until now</CardSubTitle>
-                </CardLabel>
-              </CardHeader>
-              <CardBody>
-              <div className='d-flex align-items-center pb-3'>
-													<div className='flex-shrink-0'>
-														<Icon
-															icon='AttachMoney'
-															size='4x'
-															color='warning'
-														/>
-													</div>
-													<div className='flex-grow-1 ms-3'>
-														<div className='fw-bold fs-3 mb-0'>
-															{profit}
-														
-														</div>
-														<div
-															className={classNames({
-																'text-muted': !darkModeStatus,
-																'text-light': darkModeStatus,
-															})}>
-													Total profit until now 
-														</div>
-													</div>
-												</div>
-              </CardBody>
-            </Card>
-          </div>
+
           <div className='col-xxl-4'>
             <Card className={classNames(
               'transition-base rounded-2 mb-0 text-dark',
@@ -554,26 +287,35 @@ const DashboardPage = () => {
                   </CardTitle>
                   <CardSubTitle>Work done until now </CardSubTitle>
                 </CardLabel>
+                <CardActions>
+                  <Button
+                    icon='ArrowForwardIos'
+                    aria-label='Read More'
+                    hoverShadow='default'
+                    color={darkModeStatus ? 'dark' : null}
+                    onClick={payslipsPage}
+                  />
+                </CardActions>
               </CardHeader>
               <CardBody>
-              <div className='d-flex align-items-center pb-3'>
-													<div className='flex-shrink-0'>
-													
-													</div>
-													<div className='flex-grow-1 ms-3'>
-														<div className='fw-bold fs-3 mb-0'>
-														{_.round(hoursWorked,2)}
-														
-														</div>
-														<div
-															className={classNames({
-																'text-muted': !darkModeStatus,
-																'text-light': darkModeStatus,
-															})}>
-													Total work done in hours 
-														</div>
-													</div>
-												</div>
+                <div className='d-flex align-items-center pb-3'>
+                  <div className='flex-shrink-0'>
+
+                  </div>
+                  <div className='flex-grow-1 ms-3'>
+                    <div className='fw-bold fs-3 mb-0'>
+                      {_.round(hoursWorked, 2)}
+
+                    </div>
+                    <div
+                      className={classNames({
+                        'text-muted': !darkModeStatus,
+                        'text-light': darkModeStatus,
+                      })}>
+                      Total work done in hours
+                    </div>
+                  </div>
+                </div>
               </CardBody>
             </Card>
           </div>

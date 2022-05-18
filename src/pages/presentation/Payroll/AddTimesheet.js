@@ -51,8 +51,11 @@ const AddTimesheet = (props) => {
 
   const [latitude, setLatitude] = useState();
   const [longitude, setLongitude] = useState();
- 
 
+  const [punchinDisable, setPunchinDisable] = useState(true);
+  const [punchoutDisable, setPunchoutDisable] = useState(true);
+  const [pauseDisable, setPauseDisable] = useState(true);
+  const [resumeDisable, setResumeDisable] = useState(true);
   // const [modal1, setModal1] = useState(false);
 
   // const [currentTime] = useState(new Date());
@@ -176,10 +179,7 @@ const AddTimesheet = (props) => {
       setJobsites(res.data);
     });
 
-    // document.getElementById("punchin").style.display = "none";
-    // document.getElementById("punchout").style.display = "none";
-    // document.getElementById("pause").style.display = "none";
-    // document.getElementById("resume").style.display = "none";
+
   }, []);
 
   const punchIn = (e) => {
@@ -212,22 +212,21 @@ const AddTimesheet = (props) => {
       .then((res) => {
         console.log("Punchin res:", res);
 
+        axios.get(`${BASE_URL}/api/employeeTimesheets`).then((res) => {
+          console.log("activities", res.data);
+          let filterAttendance = _.filter(res.data, {
+            employee: employeeId,
+            jobsite: jobsiteId,
+            attendanceDate,
+          });
 
+          console.log("filterAttendance:", filterAttendance);
+          setAttendanceActivities(filterAttendance);
+        });
 
-        // axios.get(`${BASE_URL}/api/employeeTimesheets`).then((res) => {
-        //   console.log("activities", res.data);
-        //   let filterAttendance = _.filter(res.data, {
-        //     employee: employeeId,
-        //     jobsite: jobsiteId,
-        //     attendanceDate,
-        //   });
+        setPunchinDisable(true);
+        setPunchoutDisable(false);
 
-        //   console.log("filterAttendance:", filterAttendance);
-        //   setAttendanceActivities(filterAttendance);
-        // });
-
-        // document.getElementById("punchin").disabled = true;
-        // document.getElementById("punchout").disabled = false;
 
       }).catch(err => console.log(err));
   };
@@ -274,8 +273,9 @@ const AddTimesheet = (props) => {
         });
 
 
-        // document.getElementById("pause").disabled = true;
-        // document.getElementById("resume").disabled = false;
+        setPauseDisable(true);
+        setResumeDisable(false);
+
       });
   };
 
@@ -409,9 +409,10 @@ const AddTimesheet = (props) => {
 
         });
 
+        setPauseDisable(false);
+        setResumeDisable(true);
 
-        // document.getElementById("pause").disabled = false;
-        // document.getElementById("resume").disabled = true;
+
       });
   };
 
@@ -512,7 +513,7 @@ const AddTimesheet = (props) => {
             totalWorkerAmount = workedHours * ratePerHour;
 
             console.log("Worked Hours:", workedHours);
-          
+
 
             const timesheetObject = {
               employee: employeeId,
@@ -538,27 +539,28 @@ const AddTimesheet = (props) => {
 
           });
 
-          // if (pauseTime === undefined && resumeTime === undefined) {
-          //   workedHours = workHours;
-          // } else {
-          //   //To Calculate Break Hours
-          //   let pauseOneObj = new Date(pauseTime);
-          //   let resumeTwoObj = new Date(resumeTime);
-          //   let milliseconds = Math.abs(resumeTwoObj - pauseOneObj);
-          //   breakHours = milliseconds / 36e5;
+          if (pauseTime === undefined && resumeTime === undefined) {
+            workedHours = workHours;
+          } else {
+            //To Calculate Break Hours
+            let pauseOneObj = new Date(pauseTime);
+            let resumeTwoObj = new Date(resumeTime);
+            let milliseconds = Math.abs(resumeTwoObj - pauseOneObj);
+            breakHours = milliseconds / 36e5;
 
-          //   console.log("Total break hours:", breakHours);
-          //   workedHours = workHours - breakHours;
-          //   totalWorkerAmount = workedHours * ratePerHour;
-          // }
+            console.log("Total break hours:", breakHours);
+            workedHours = workHours - breakHours;
+            totalWorkerAmount = workedHours * ratePerHour;
+          }
 
 
 
 
         });
 
-        // document.getElementById("punchin").disabled = true;
-        // document.getElementById("punchout").disabled = true;
+        setPunchinDisable(true);
+        setPunchoutDisable(true);
+
 
       });
   };
@@ -621,19 +623,30 @@ const AddTimesheet = (props) => {
 
   let totalEarning = ratePerHour * sumTotalWorkHours;
 
-  let joblist = _.map(workerjobsites, (job) => {
 
+  let listJobsites = [];
+  listJobsites.push({
+    label: " ",
+    value: " "
+  });
 
-    return (
-      <option key={job._id} value={job._id}>
-        {job.address}
-      </option>
-    );
+  _.map(workerjobsites, (jobsite) => {
+    let jobsiteObject = {
+      label: jobsite.address,
+      value: jobsite._id,
+    };
 
+    listJobsites.push(jobsiteObject);
   });
 
   const onSelectJobSite = (e) => {
+    console.log("selected jobsite", e.target.value);
+
     setJobsiteId(e.target.value);
+    if (e.target.value != " ") {
+      setPunchinDisable(false);
+      setPauseDisable(false);
+    }
 
     axios.get(`${BASE_URL}/api/employeeTimesheets`).then((res) => {
       console.log("employee timesheet", res.data);
@@ -666,38 +679,40 @@ const AddTimesheet = (props) => {
       console.log("activities:", activities);
 
       if (activities[0] === "Punchin") {
-        console.log("Punchin");
-        // document.getElementById("punchin").disabled = true;
-        // document.getElementById("punchout").disabled = false;
-        // document.getElementById("pause").disabled = false;
-        // document.getElementById("resume").disabled = true;
+        setPunchoutDisable(false);
+        setPauseDisable(false);
+        setPunchinDisable(true);
+        setResumeDisable(true);
+
       }
-      // else if (activities[0] === "Pause") {
-      //   console.log("Pause");
-      //   document.getElementById("punchin").disabled = true;
-      //   document.getElementById("punchout").disabled = true;
-      //   // document.getElementById("pause").disabled = true;
-      //   // document.getElementById("resume").disabled = false;
-      // } else if (activities[0] === "Resume") {
-      //   document.getElementById("punchin").disabled = true;
-      //   document.getElementById("punchout").disabled = false;
-      //   document.getElementById("pause").disabled = true;
-      //   document.getElementById("resume").disabled = true;
-      // } 
+      else if (activities[0] === "Pause") {
+        setPunchoutDisable(true);
+        setPauseDisable(true);
+        setPunchinDisable(true);
+        setResumeDisable(false);
+
+      } else if (activities[0] === "Resume") {
+        setPunchoutDisable(false);
+        setPauseDisable(true);
+        setPunchinDisable(true);
+        setResumeDisable(true);
+
+      }
       else if (activities[0] === "Punchout") {
-        // document.getElementById("punchin").disabled = true;
-        // document.getElementById("punchout").disabled = true;
-        // document.getElementById("pause").disabled = true;
-        // document.getElementById("resume").disabled = true;
+        setPunchoutDisable(true);
+        setPauseDisable(true);
+        setPunchinDisable(true);
+        setResumeDisable(true);
+
       } else {
-        // document.getElementById("punchin").disabled = false;
-        // document.getElementById("punchout").disabled = true;
-        // document.getElementById("pause").disabled = true;
-        // document.getElementById("resume").disabled = true;
+        setPunchoutDisable(true);
+        setPauseDisable(true);
+        setPunchinDisable(false);
+        setResumeDisable(true);
+
       }
 
-      // document.getElementById("punchin").style.display = "inline";
-      // document.getElementById("punchout").style.display = "inline";
+
 
     });
 
@@ -736,24 +751,24 @@ const AddTimesheet = (props) => {
       console.log("Break activities:", activities);
 
 
-      //  if (activities.length===0) {
-      //   document.getElementById("pause").disabled = false;
-      //   document.getElementById("resume").disabled = true;
-      //  } else {
-      //      if ((activities[0].activity === "Pause")&&(activities[0].status === "Ongoing")) {
-      //       console.log("Pause");
+      if (activities.length === 0) {
+        setPauseDisable(false);
+        setResumeDisable(true);
 
-      //       document.getElementById("pause").disabled = true;
-      //       document.getElementById("resume").disabled = false;
-      //     } else {
+      } else {
+        if ((activities[0].activity === "Pause") && (activities[0].status === "Ongoing")) {
+          setPauseDisable(true);
+          setResumeDisable(false);
 
-      //       document.getElementById("pause").disabled = false;
-      //       document.getElementById("resume").disabled = true;
-      //     }
-      //   }
 
-      // document.getElementById("pause").style.display = "inline";
-      // document.getElementById("resume").style.display = "inline";
+        } else {
+          setPauseDisable(false);
+          setResumeDisable(true);
+
+        }
+      }
+
+
     });
   };
 
@@ -765,20 +780,20 @@ const AddTimesheet = (props) => {
           <strong>Select Jobsite</strong>
           <div
           >
-            <select
+            <Select
               name="jobsite"
               className="form-control"
+              size='l'
+              width="50"
               onChange={onSelectJobSite}
-            >
-              <option>Select Jobsite</option>
-              {joblist}
-            </select>
+              list={listJobsites}
+            />
 
           </div>
 
         </SubHeaderLeft>
         <SubHeaderRight>
-          <Button
+          {/* <Button
             color='info'
             isLight
             icon='PublishedWithChanges'
@@ -786,7 +801,7 @@ const AddTimesheet = (props) => {
               setNewTransferModal(true);
             }}>
             Add Manually
-          </Button>
+          </Button> */}
         </SubHeaderRight>
       </SubHeader>
       <Page>
@@ -820,6 +835,7 @@ const AddTimesheet = (props) => {
                         size='lg'
                         value="Punch In"
                         isLight data-tour='filter'
+                        isDisable={punchinDisable}
                         onClick={punchIn}>
                         Punch In
                       </Button>
@@ -841,6 +857,7 @@ const AddTimesheet = (props) => {
                         size='lg'
                         value="Punch out"
                         onClick={punchOut}
+                        isDisable={punchoutDisable}
                         isLight data-tour='filter'>
                         Logout
                       </Button>
@@ -878,6 +895,7 @@ const AddTimesheet = (props) => {
                         color='warning'
                         size='lg'
                         onClick={pause}
+                        isDisable={pauseDisable}
                         isLight data-tour='filter'>
 
                         Pause
@@ -901,6 +919,7 @@ const AddTimesheet = (props) => {
                         color='info'
                         size='lg'
                         onClick={resume}
+                        isDisable={resumeDisable}
                         isLight data-tour='filter'>
 
                         Resume
@@ -947,7 +966,7 @@ const AddTimesheet = (props) => {
 
           </div>
           <div className='col-lg-4'>
-          <Card>
+            <Card>
               <CardHeader>
                 <CardLabel icon="CashStack"  >
                   <CardTitle>Total Earnings</CardTitle>
@@ -985,7 +1004,7 @@ const AddTimesheet = (props) => {
                     <div className='h4 mb-3'>Hours worked</div>
                     <span className='display-6 fw-bold text-success'>   {`${timeResult.Days} Days ${timeResult.Hours} Hrs  ${timeResult.Minutes} Mins.`}
                     </span>
-                    
+
                   </div>
                   {/* <div className='col-lg-6'>
                   <Chart
@@ -1011,7 +1030,7 @@ const AddTimesheet = (props) => {
                     <div className='h4 mb-3'>Total Jobsites worked</div>
                     <span className='display-6 fw-bold text-info'>   {workerjobsites.length}
                     </span>
-                    
+
                   </div>
                   {/* <div className='col-lg-6'>
                   <Chart
@@ -1037,7 +1056,7 @@ const AddTimesheet = (props) => {
                     <div className='h4 mb-3'>Payslips finalized</div>
                     <span className='display-6 fw-bold text-warning'>   {payslips.length}
                     </span>
-                    
+
                   </div>
                   {/* <div className='col-lg-6'>
                   <Chart
@@ -1050,7 +1069,7 @@ const AddTimesheet = (props) => {
                 </div>
               </CardBody>
             </Card>
-           
+
           </div>
         </div>
 

@@ -83,17 +83,17 @@ export const demoPages = {
 		icon: 'Train',
     subMenu: null
 	},
-  viewInvoices: {
-		id: 'viewInvoices',
+  ListInvoices: {
+		id: 'listInvoices',
 		text: 'My Invoices',
-		path: 'view-invoices',
+		path: 'list-invoices',
 		icon: 'CurrencyDollar',
     subMenu: null
 	},
-  viewPaymentHistory: {
-		id: 'viewPaymentHistory',
-		text: 'My Payment History',
-		path: 'view-payment-history',
+  ListPayslips: {
+		id: 'listPayslips',
+		text: 'My Payslips',
+		path: 'list-payslips',
 		icon: 'CashCoin',
     subMenu: null
 	},

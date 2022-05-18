@@ -50,7 +50,7 @@ const ProductViewPage = () => {
   const location = useLocation();
 
   console.log(location.state);
-  
+
   const validateAddress = (values) => {
     const errors = {};
     if (!values.address) {
@@ -341,7 +341,7 @@ const ProductViewPage = () => {
           rate: res.data.ratePerHour,
           contractor: res.data.Contractor,
           gst: res.data.GSTRegistered,
-          tax: res.data.tax
+          tax: res.data.taxRate
         })
       });
 
@@ -751,83 +751,37 @@ const ProductViewPage = () => {
                       </FormGroup>
                     </div>
                     <div className='col-md-6'>
-                      <FormGroup
-                        id='rate'
-                        label='Hourly Rate (NZD) '
-                        isFloating>
-                        <Input
-                          placeholder="$23"
-                          onChange={formikAccount.handleChange}
-                          onBlur={formikAccount.handleBlur}
-                          value={formikAccount.values.rate}
-                          isValid={formikAccount.isValid}
-                          isTouched={formikAccount.touched.rate}
-                          invalidFeedback={formikAccount.errors.rate}
-                          validFeedback='Looks good!'
-                        />
-                      </FormGroup>
+                      Hourly Rate (NZD)
+                      <p className='h5'  >   {formikAccount.values.rate}
+
+                      </p>
+
+
                     </div>
 
                     <div className='col-md-6'>
-                      <FormGroup
-                        id='contractor '
-                        label='Is a Contractor ? '
-                        isFloating>
-                        <select
-                          name="contractor"
-                          onChange={formikAccount.handleChange}
-                          onBlur={formikAccount.handleBlur}
-                          value={formikAccount.values.contractor}
-                          isValid={formikAccount.isValid}
-                          isTouched={formikAccount.touched.contractor}
-                          invalidFeedback={formikAccount.errors.contractor}
-                          validFeedback='Looks good!'
-                          className="form-control"
-                        >
-                          <option value=""></option>
-                          <option value="Yes">Yes</option>
-                          <option value="No">No</option>
-                        </select>
-                      </FormGroup>
+                      Is a Contractor ?
+                      <p className='h5'>   {formikAccount.values.contractor}
+
+                      </p>
+
+
                     </div>
-                    <div className='col-lg-12'>
-                      <FormGroup
-                        id='gst '
-                        label='Is GST registered ? '
-                        isFloating>
-                        <select
-                          name="gst"
-                          onChange={formikAccount.handleChange}
-                          onBlur={formikAccount.handleBlur}
-                          value={formikAccount.values.gst}
-                          isValid={formikAccount.isValid}
-                          isTouched={formikAccount.touched.gst}
-                          invalidFeedback={formikAccount.errors.gst}
-                          validFeedback='Looks good!'
-                          className="form-control"
-                        >
-                          <option value=""></option>
-                          <option value="Yes">Yes</option>
-                          <option value="No">No</option>
-                        </select>
-                      </FormGroup>
+                    <div className='col-md-6'>
+                      GST Registered ?
+                      <p className='h5'>   {formikAccount.values.gst}
+
+                      </p>
+
+
                     </div>
-                    <div className='col-lg-12'>
-                      <FormGroup
-                        id='tax'
-                        label='Tax Rate'
-                        isFloating>
-                        <Input
-                          placeholder="23"
-                          onChange={formikAccount.handleChange}
-                          onBlur={formikAccount.handleBlur}
-                          value={formikAccount.values.tax}
-                          isValid={formikAccount.isValid}
-                          isTouched={formikAccount.touched.tax}
-                          invalidFeedback={formikAccount.errors.tax}
-                          validFeedback='Looks good!'
-                        />
-                      </FormGroup>
+                    <div className='col-md-6'>
+                      Tax Rate
+                      <p className='h5'>   {formikAccount.values.tax}
+
+                      </p>
+
+
                     </div>
 
 

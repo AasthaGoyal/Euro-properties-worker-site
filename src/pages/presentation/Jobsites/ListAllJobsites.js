@@ -205,12 +205,21 @@ const ListAllJobsites = (props) => {
 
   const searchJob = (e) => {
     axios.get(`${BASE_URL}/api/jobsites`).then((res) => {
-      console.log("jobsites", res.data);
+      let jobs = res.data;
+      let userJobsites = [];
+      jobs.map((job) => {
+        job.workersList && job.workersList.map((worker) => {
+          if(worker == props.auth.user.id)
+          {
+            userJobsites.push(job)
+          }
+        })
+        
+      })
 
       let search = e.target.value;
-      let jobsiteData = res.data;
 
-      var jobsiteResult = _.filter(jobsiteData, function (obj) {
+      var jobsiteResult = _.filter(userJobsites, function (obj) {
         return (
           obj.address.indexOf(search) !== -1 ||
           obj.ownerName.indexOf(search) !== -1 ||
@@ -228,14 +237,24 @@ const ListAllJobsites = (props) => {
   const searchbyStatus = (e) => {
     setStatus(e.target.value);
     axios.get(`${BASE_URL}/api/jobsites`).then((res) => {
-      console.log("jobsites", res.data);
+      let jobs = res.data;
+      let userJobsites = [];
+      jobs.map((job) => {
+        job.workersList && job.workersList.map((worker) => {
+          if(worker == props.auth.user.id)
+          {
+            userJobsites.push(job)
+          }
+        })
+        
+      })
       let status = e.target.value;
-      let jobsiteData = res.data;
+    
 
       if (status === 'All') {
-        setJobsites(jobsiteData);
+        setJobsites(userJobsites);
       } else {
-        var jobsiteResult = _.filter(jobsiteData, ['status', status]);
+        var jobsiteResult = _.filter(userJobsites, ['status', status]);
 
         setJobsites(jobsiteResult);
       }

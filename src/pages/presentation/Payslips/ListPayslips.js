@@ -43,159 +43,117 @@ import Moment from "react-moment";
 import showNotification from '../../../components/extras/showNotification';
 import jwt_decode from 'jwt-decode';
 
-const ListInvoices = (props) => {
+const ListPayslips = (props) => {
   const { themeStatus, darkModeStatus } = useDarkMode();
 
   const token = localStorage.getItem('jwtToken');
 
   const decoded = jwt_decode(token);
   const user = decoded;
-  const [employeeId, setEmployeeId] = useState();
-  const [ratePerHour, setRatePerHour] = useState();
-  const [employeeName, setEmployeeName] = useState();
-  const [employerName] = useState(
-    "EURO QUALITY PAINTERS LIMITED"
-  );
-  const [startDate] = useState(new Date());
-  const [endDate] = useState(new Date());
-  const [invoices, setInvoices] = useState([]);
-  const [loading] = useState(false);
+  const [payslips, setPayslips] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [invoicesPerPage] = useState(20);
-  //const [invoicesList, setInvoicesList] = useState([]);
-  const [modal, setModal] = useState(false);
-  const [invoiceId, setInvoiceId] = useState();
+  const [payslipsPerPage] = useState(20);
 
   React.useEffect(() => {
-    let employeeName = `${user.firstName} ${user.lastName}`;
-    setEmployeeName(employeeName);
-
     axios.get(`${BASE_URL}/api/users`).then((res) => {
+      let users = res.data;
 
-
-      let filterEmployee = _.filter(res.data, ["_id", user.id]);
+      let filterEmployee = _.filter(users, ["_id", user.id]);
       console.log("Filter Employees:", filterEmployee);
-      setEmployeeId(filterEmployee[0]._id);
-      setRatePerHour(filterEmployee[0].ratePerHour);
-
-      axios.get(`${BASE_URL}/api/workerinvoices`).then((res) => {
-        let workerInvoices = res.data;
-
-        let invoices = _.filter(workerInvoices, [
+      //setEmployee(filterEmployee);
+      setLoading(true);
+      axios.get(`${BASE_URL}/api/workerpayslips`).then((response) => {
+        setLoading(false);
+        let payslips = response.data;
+        let filterPayslips = _.filter(payslips, [
           "employee",
           filterEmployee[0]._id,
         ]);
-
-        console.log("invoices are", invoices);
-        setInvoices(invoices);
+        console.log("filterPayslips:", filterPayslips);
+        setPayslips(filterPayslips);
       });
     });
-  }, [user.id, user.firstName, user.lastName]);
-
-  const openModal = (id) => {
-    // setJobsiteId(id)
-    setModal(!modal);
-    setInvoiceId(id);
-    console.log("Invoice:", id);
-  };
+  }, [user.id]);
 
 
-  // // const { themeStatus, darkModeStatus } = useDarkMode();
-  // const [currentPage, setCurrentPage] = useState(1);
-
-
-  // const { users, requestSort, getClassNamesFor } = useSortableData(userdata);
-
-  // console.log("sorted users", users);
-  // const { jsonUsers } = JSON.stringify(users);
-  let invoiceTable;
+  let payslipTable;
 
   // Get current posts
-  const indexOfLastInvoice = currentPage * invoicesPerPage;
-  const indexOfFirstInvoice = indexOfLastInvoice - invoicesPerPage;
-  const currentInvoices = invoices.slice(
-    indexOfFirstInvoice,
-    indexOfLastInvoice
+  const indexOfLastPayslip = currentPage * payslipsPerPage;
+  const indexOfFirstPayslip = indexOfLastPayslip - payslipsPerPage;
+  const currentPayslips = payslips.slice(
+    indexOfFirstPayslip,
+    indexOfLastPayslip
   );
 
   // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  if (currentInvoices.length === 0) {
-    invoiceTable = (
+  console.log("payslips:", currentPayslips);
+
+
+
+  if (currentPayslips.length === 0) {
+    payslipTable = (
       <tr>
-        <td colSpan="8">No records</td>
+        <td colSpan="7">No records</td>
       </tr>
     );
   } else {
-    invoiceTable = _.map(currentInvoices, (invoice) => {
-      let status;
+    payslipTable = _.map(currentPayslips, (payslip) => {
+      return (
+        <tr key={payslip._id}>
+          <td>{payslip.invoiceNumber}</td>
+          <td>{payslip.payslipNumber}</td>
+          <td>{payslip.payslipDate}</td>
+          <td>{payslip.totalHoursWorked}</td>
+          <td>{payslip.amountToPay}</td>
+          <td>
 
-      if (invoice.length === 0) {
-        return (
-          <tr>
-            <td colSpan="8">No records</td>
-          </tr>
-        );
-      } else {
+            <Button
+              isLink
+              color={payslip.status == "Paid" ? "success" : "info"}
+              icon='Circle'
+              value={payslip.status}
+              className='text-nowrap'>
+              {payslip.status}
+            </Button>
 
-        return (
-          <tr key={invoice._id}>
-
-            <td>{invoice.invoiceNumber}</td>
-            <td>{invoice.invoiceDate}</td>
-            <td>{invoice.startDate}</td>
-            <td>{invoice.EndDate}</td>
-            <td>{_.round(invoice.totalHoursWorked, 2)}</td>
-            <td>$ {_.round(invoice.amountToPay, 2)}</td>
-
-            <td>
-
+          </td>
+          <td>
+            <Link to={`/view-payslips/${payslip._id}`}>
               <Button
-                isLink
-                color={invoice.status == "Paid" ? "success" : "info"}
-                icon='Circle'
-                value={invoice.status}
-                className='text-nowrap' >
-                {invoice.status}
+                isOutline={!darkModeStatus}
+                color='dark'
+                isLight={darkModeStatus}
+                className={classNames('text-nowrap', {
+                  'border-light': !darkModeStatus,
+                })}
+                icon='Eye'>
+                View
               </Button>
-
-            </td>
-            <td>
-              <Link to={`/view-invoices/${invoice._id}`}>
-                <Button
-                  isOutline={!darkModeStatus}
-                  color='dark'
-                  isLight={darkModeStatus}
-                  className={classNames('text-nowrap', {
-                    'border-light': !darkModeStatus,
-                  })}
-                  icon='Eye'>
-                  View
-                </Button>
-              </Link>
+            </Link>
 
 
-            </td>
-
-          </tr>
-        );
-      }
+          </td>
+        </tr>
+      );
     });
   }
 
-  let invoiceLoading;
+  let payslipLoading;
 
   if (loading) {
-    invoiceLoading = (
+    payslipLoading = (
       <tr>
-        <td colSpan="8">
+        <td colSpan="7">
           <h3>Loading...</h3>
         </td>
       </tr>
     );
   } else {
-    invoiceLoading = invoiceTable;
+    payslipLoading = payslipTable;
   }
 
 
@@ -217,9 +175,9 @@ const ListInvoices = (props) => {
       <Page container='fluid'>
         <Card >
           <CardHeader borderSize={1}>
-            <CardLabel icon='PointOfSale' >
+            <CardLabel icon='PiggyBank' >
 
-              <CardTitle>My Invoices</CardTitle>
+              <CardTitle>My Payslips</CardTitle>
 
             </CardLabel>
             <CardActions>
@@ -237,12 +195,11 @@ const ListInvoices = (props) => {
               <thead>
                 <tr>
 
-                  <th>Invoice#</th>
-                  <th>Invoice Date</th>
-                  <th>From Date</th>
-                  <th>To Date</th>
+                  <th>Invoice Number </th>
+                  <th>Payslip Number </th>
+                  <th>Payslip Date</th>
                   <th>Total Work Hours</th>
-                  <th>Amount To Pay (Ex. 20% Tax)</th>
+                  <th>Total Amount</th>
 
                   <th>Status</th>
                   <th>Action</th>
@@ -251,7 +208,7 @@ const ListInvoices = (props) => {
                 </tr>
               </thead>
               <tbody>
-                {invoiceLoading}
+                {payslipLoading}
                 {/* {filteredData.map((i) => (
 									<CommonTableRow
 										key={i.id}
@@ -284,7 +241,7 @@ const ListInvoices = (props) => {
 };
 
 
-ListInvoices.propTypes = {
+ListPayslips.propTypes = {
   auth: PropTypes.object.isRequired,
 };
 
@@ -293,4 +250,4 @@ const mapStateToProps = (state) => ({
   auth: state.auth,
 });
 
-export default connect(mapStateToProps)(ListInvoices);
+export default connect(mapStateToProps)(ListPayslips);

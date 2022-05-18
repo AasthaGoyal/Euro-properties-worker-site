@@ -76,13 +76,13 @@ const Timesheets = (props) => {
       setWorkerJobsites(userJobsites);
 
       axios.get(`${BASE_URL}/api/employeeTimesheetFinal`).then((response) => {
-
+        console.log("all timesehtees", response.data);
         let timesheets = response.data;
-  
+
         let filterTimesheets = _.filter(timesheets, {
           "employee": user.id,
         });
-  
+
         setTimesheet(filterTimesheets);
       });
 
@@ -124,18 +124,21 @@ const Timesheets = (props) => {
       </tr>
     );
   } else {
+    console.log("current timehseets", currentTimesheets);
+
     timesheetTable = _.map(currentTimesheets, (timesheet) => {
+
 
       let jobsite = _.filter(workerJobsites, ["_id", timesheet.jobsite]);
 
-    
+
 
       let breakResult = SplitTime(_.round(timesheet.breakHours, 2));
       let workResult = SplitTime(_.round(timesheet.totalWorkHours, 2));
 
       return (
         <tr key={timesheet._id}>
-          <td>{jobsite[0].address}</td>
+          <td>{jobsite[0] && jobsite[0].address}</td>
 
           <td>
             <Moment date={timesheet.punchinTime} />
@@ -175,18 +178,17 @@ const Timesheets = (props) => {
 
 
   const onSelectJobSite = (e) => {
-   
-    if(e.target.value == "All")
-    {
-      
+
+    if (e.target.value == "All") {
+      setFilteredValue("All")
       axios.get(`${BASE_URL}/api/employeeTimesheetFinal`).then((response) => {
 
         let timesheets = response.data;
-  
+
         let filterTimesheets = _.filter(timesheets, {
           "employee": user.id,
         });
-  
+
         setTimesheet(filterTimesheets);
       });
 
@@ -196,23 +198,23 @@ const Timesheets = (props) => {
           setFilteredValue(job.address);
         }
       })
-     
+
       axios.get(`${BASE_URL}/api/employeeTimesheetFinal`).then((response) => {
 
         let timesheets = response.data;
-  
+
         let filterTimesheets = _.filter(timesheets, {
           "employee": user.id,
           "jobsite": e.target.value
         });
-  
+
         setTimesheet(filterTimesheets);
       });
-     
+
     }
 
-   
-    
+
+
   };
 
   let listJobsites = [];

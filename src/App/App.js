@@ -92,7 +92,7 @@ const App = () => {
 	});
 
 	//	Add paths to the array that you don't want to be "Aside".
-	const withOutAsidePages = ["/", "/forget-password"];
+	const withOutAsidePages = ["/", "/forget-password", "/reset-password/token/:token"];
 
 	return (
     <Provider store={store}>

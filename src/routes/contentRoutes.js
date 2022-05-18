@@ -2,6 +2,7 @@ import React, { lazy } from 'react';
 import { dashboardMenu, demoPages } from '../menu';
 import Login from '../pages/presentation/auth/Login';
 import ForgetPassword from '../pages/presentation/auth/ForgetPassword';
+import ResetPassword from '../pages/presentation/auth/ResetPassword';
 
 const LANDING = {
 	DASHBOARD: lazy(() => import('../pages/dashboard/DashboardPage')),
@@ -11,7 +12,7 @@ const AUTH = {
 };
 const USER = {
 
-	LISTUSERS: lazy(() => import('../pages/presentation/UserPages/ListAllUsers')),	
+	VIEWUSERS: lazy(() => import('../pages/presentation/UserPages/ViewUser')),	
   
 };
 
@@ -36,9 +37,11 @@ const VEHICLES = {
 
 const PAYROLL = {
   ADDTIMESHEET: lazy(() => import('../pages/presentation/Payroll/AddTimesheet')),	
-	PAYSLIPS: lazy(() => import('../pages/presentation/Payroll/Payslips')),	
+	LISTPAYSLIPS: lazy(() => import('../pages/presentation/Payslips/ListPayslips')),	
+  VIEWPAYSLIPS: lazy(() => import('../pages/presentation/Payslips/ViewPayslips')),	
   TIMESHEETS: lazy(() => import('../pages/presentation/Payroll/Timesheets')),
-  INVOICES: lazy(() => import('../pages/presentation/Invoices/ListInvoices')),
+  LISTINVOICES: lazy(() => import('../pages/presentation/Invoices/ListInvoices')),
+  VIEWINVOICES: lazy(() => import('../pages/presentation/Invoices/ViewInvoices')),
 }
 // const PAGE_LAYOUTS = {
 // 	HEADER_SUBHEADER: lazy(() => import('../pages/presentation/page-layouts/HeaderAndSubheader')),
@@ -75,6 +78,17 @@ const presentation = [
 		exact: true,
 	},
   {
+    path:"/reset-password/token/:token",
+		element: <ResetPassword />,
+		exact: true,
+
+  },
+  {
+		path: `/user-pages/editUsers/:id`,
+		element: <USER.VIEWUSERS />,
+		exact: true,
+	},
+  {
 		path: demoPages.AddTimesheet.path,
 		element: < PAYROLL.ADDTIMESHEET/>,
 		exact: true,
@@ -85,8 +99,23 @@ const presentation = [
 		exact: true,
 	},
   {
-		path: demoPages.viewInvoices.path,
-		element: < PAYROLL.INVOICES/>,
+		path: demoPages.ListInvoices.path,
+		element: < PAYROLL.LISTINVOICES/>,
+		exact: true,
+	},
+  {
+		path:`/view-invoices/:id`,
+		element: < PAYROLL.VIEWINVOICES/>,
+		exact: true,
+	},
+  {
+		path: demoPages.ListPayslips.path,
+		element: < PAYROLL.LISTPAYSLIPS/>,
+		exact: true,
+	},
+  {
+		path:`/view-payslips/:id`,
+		element: < PAYROLL.VIEWPAYSLIPS/>,
 		exact: true,
 	},
   {

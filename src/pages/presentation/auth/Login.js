@@ -63,6 +63,7 @@ const Login = (props) => {
       axios
         .post(`${BASE_URL}/api/users/login`, userData)
         .then(res => {
+          console.log(res);
           if (res.status == 200) {
             
             // Save to localStorage
@@ -87,7 +88,16 @@ const Login = (props) => {
               "Those credentials didn't worked. Please change the username/password and try again.", 'info'
             );
           }
-        });
+        }).catch(err => {
+          console.log(err);
+          showNotification(
+            <span className='d-flex align-items-center'>
+              <Icon icon='EmojiAngry' size='lg' className='me-1' />
+              <span>Invalid Username/password</span>
+            </span>,
+            "Those credentials didn't worked. Please change the username/password and try again.", 'info'
+          );
+        })
 
 
 
@@ -149,7 +159,7 @@ const Login = (props) => {
                     <FormGroup
                       id='username'
                       isFloating
-                      label='Your email or username'>
+                      label='Your Username'>
                       <Input
 
                         onChange={formik.handleChange}

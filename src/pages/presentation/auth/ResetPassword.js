@@ -1,6 +1,6 @@
 import React, { useCallback, Component, useState } from 'react';
 import PropTypes from "prop-types";
-import { useNavigate, useHistory, Link } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import { connect } from "react-redux";
 import classNames from 'classnames';
 import _ from "lodash";
@@ -20,118 +20,98 @@ import axios from "axios";
 import { BASE_URL } from "../../../layout/actions/actionConstant";
 import { loginUser } from "../../../layout/actions/authActions";
 
-const ForgetPassword = (props) => {
+const ResetPassword = () => {
 
 
   const [username, setUsername] = useState();
   const [password, setPassword] = useState();
   const [isAuthenticated, setAuthenticated] = useState(false);
   const [users, setUsers] = useState([]);
-
-
+  const [userId, setUserId] = useState();
+  const { token } = useParams();
   const navigate = useNavigate();
+
   const validate = (values) => {
     const errors = {};
 
     if (!values.email) {
       errors.username = 'Required';
     }
-
-    if (!values.firstName) {
-      errors.username = 'Required';
+    if (!values.password) {
+      errors.password = 'Required';
     }
-    if (!values.lastName) {
-      errors.username = 'Required';
+
+
+    if (!values.confirmPassword) {
+      errors.confirmPassword = 'Required';
+    }
+
+
+    if (values.password != values.confirmPassword) {
+      errors.confirmPassword = "The Password and Confirm Password doesn't match";
     }
 
 
     return errors;
   };
+
+
+  React.useEffect(() => {
+  
+    axios
+      .get(`${BASE_URL}/api/users/new_password/token/${token}`)
+      .then((response) => {
+        
+        setUserId(response.data._id);
+
+
+      });
+  }, []);
+
   const formik = useFormik({
 
     initialValues: {
       email: '',
-
-
+      password: '',
+      confirmPassword: ''
     },
     validate,
     // eslint-disable-next-line no-unused-vars
     onSubmit: (values) => {
 
-      console.log(values);
+      const userData = {
+        id: userId,
+        password: values.password
 
+      };
 
-      let userResult = [];
+      axios.post(`${BASE_URL}/api/users/update_password`, userData)
+        .then(res => {
+          console.log(res.data);
+          if (res.status == 200) {
+            showNotification(
+              <span className='d-flex align-items-center'>
+                <Icon icon='EmojiSmile' size='lg' className='me-1' />
+                <span>Password Updated Successfully</span>
+              </span>,
+              "The password has been successfully reset", "success"
+            );
 
-      users.map((user) => {
-        if (user.firstName == values.firstName && user.lastName == values.lastName && user.email == values.email) {
-          userResult.push(user);
-          console.log(user);
-        }
-      })
-
-      if (userResult[0]) {
-
-        const userData = {
-          email: values.email
-        }
-
-        axios.post(`${BASE_URL}/api/users/reset_password`, userData).then((response) => {
-
-          console.log('Forgot Password response:', response);
-
-          let token = response.data.token;
-          const toSend = ({
-            to_email: userResult[0].email,
-            to_name: userResult[0].firstName,
-            message: `To Reset the password follow the link https://localhost:3001/reset-password/token/${token}`,
-          });
-
-          send('service_9qug9hv', 'template_ob1b2oo', toSend, 'wr1S52Ze1ly-Wk_9C')
-            .then((result) => {
-              console.log(result);
-            }, (error) => {
-              console.log(error.text);
-            });
-
-          showNotification(
-            <span className='d-flex align-items-center'>
-              <Icon icon='EmojiSmile' size='lg' className='me-1' />
-              <span>Forget Password email send</span>
-            </span>,
-            "A confirmation email has been send. Follow the email to reset your password", "success"
-          );
+          } else {
+            showNotification(
+              <span className='d-flex align-items-center'>
+                <Icon icon='EmojiAngry' size='lg' className='me-1' />
+                <span>Some Error occured</span>
+              </span>,
+              "Some error occured in resetting the password, please try again!", "warning"
+            );
+          }
 
         });
-
-
-
-
-
-
-
-      } else {
-        showNotification(
-          <span className='d-flex align-items-center'>
-            <Icon icon='EmojiAngry' size='lg' className='me-1' />
-            <span>Incorrect Email Address</span>
-          </span>,
-          "We could not find this email address in our records, please try again", "warning"
-        );
-      }
     }
-
   });
 
 
-
-  React.useEffect(() => {
-    axios.get(`${BASE_URL}/api/users`).then((response) => {
-      setUsers(response.data)
-
-    });
-  }
-  )
 
 
 
@@ -139,7 +119,7 @@ const ForgetPassword = (props) => {
   return (
 
     <PageWrapper
-      title='Login'
+      title='Reset Password'
       className={classNames('bg-danger')}>
 
 
@@ -158,48 +138,14 @@ const ForgetPassword = (props) => {
                   </Link>
                 </div>
 
-                <div className='text-center h1 fw-bold mt-5'>Forget Password</div>
-                <div className='text-center h4 text-muted mb-5'>Enter your email address to continue!</div>
+                <div className='text-center h1 fw-bold mt-5'>Reset Password</div>
+                <div className='text-center h4 text-muted mb-5'>Enter your new password to reset !</div>
 
                 <form className='row g-4'>
 
                   <div className='col-12'>
 
-                    <FormGroup
-                      isFloating
-                      id='firstName'
-                      label='First Name *'>
-                      <Input
-                        placeholder="John"
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        value={formik.values.firstName}
-                        isValid={formik.isValid}
-                        isTouched={formik.touched.firstName}
-                        invalidFeedback={
-                          formik.errors.firstName
-                        }
-                        validFeedback='Looks good!'
-                      />
-                    </FormGroup>
 
-                    <br />
-                    <FormGroup
-                      isFloating
-                      id='lastName'
-                      label='Last Name *'>
-                      <Input
-                        placeholder="Smith"
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        value={formik.values.lastName}
-                        isValid={formik.isValid}
-                        isTouched={formik.touched.lastName}
-                        invalidFeedback={formik.errors.lastName}
-                        validFeedback='Looks good!'
-                      />
-                    </FormGroup>
-                    <br />
                     <FormGroup
                       id='email'
                       isFloating
@@ -217,6 +163,38 @@ const ForgetPassword = (props) => {
                       />
                     </FormGroup>
 
+                    <br />
+                    <FormGroup
+                      isFloating
+                      id='password'
+                      label='New Password *'>
+                      <Input
+                        type="password"
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        value={formik.values.password}
+                        isValid={formik.isValid}
+                        isTouched={formik.touched.password}
+                        invalidFeedback={formik.errors.password}
+                        validFeedback='Looks good!'
+                      />
+                    </FormGroup>
+                    <br />
+                    <FormGroup
+                      isFloating
+                      id='confirmPassword'
+                      label='Confirm New Password *'>
+                      <Input
+                        type="password"
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        value={formik.values.confirmPassword}
+                        isValid={formik.isValid}
+                        isTouched={formik.touched.confirmPassword}
+                        invalidFeedback={formik.errors.confirmPassword}
+                        validFeedback='Looks good!'
+                      />
+                    </FormGroup>
                   </div>
                   <br />
                   <Button
@@ -235,8 +213,6 @@ const ForgetPassword = (props) => {
                     <div className='col-12 mt-3'>
 
                       <Link to="/">
-
-
                         <Button
 
                           color='info'
@@ -274,7 +250,7 @@ const ForgetPassword = (props) => {
 }
 
 
-ForgetPassword.propTypes = {
+ResetPassword.propTypes = {
   auth: PropTypes.object.isRequired,
   errors: PropTypes.object.isRequired,
 };
@@ -284,4 +260,4 @@ const mapStateToProps = state => ({
   errors: state.errors
 });
 
-export default connect(mapStateToProps, {})(ForgetPassword);
+export default connect(mapStateToProps, {})(ResetPassword);
