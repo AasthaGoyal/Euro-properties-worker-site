@@ -228,7 +228,7 @@ const ListAllVehicles = (props) => {
             {vehicle.vehicleName}
 
           </td>
-          P
+          
 
           <td>{vehicle.vehicleNo}</td>
           <td><Moment format="DD/MM/YYYY" date={vehicle.registrationDate} /></td>

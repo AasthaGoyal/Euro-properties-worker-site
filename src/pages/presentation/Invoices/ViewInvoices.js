@@ -45,14 +45,14 @@ import {
 } from "reactstrap";
 import jwt_decode from 'jwt-decode';
 import _ from "lodash";
-import jsPDF from 'jspdf'
-import html2canvas from 'html2canvas';
-
+import { PDFExport } from '@progress/kendo-react-pdf';
 
 
 
 const ViewInvoices = (props) => {
   const { darkModeStatus } = useDarkMode();
+
+
 
   const [redirect, setRedirect] = useState(false);
 
@@ -83,7 +83,7 @@ const ViewInvoices = (props) => {
   // const itemData = tableData.filter((item) => item.id.toString() === id.toString());
   // const data = itemData[0];
 
-
+  const [resume, setResume] = useState();
 
 
 
@@ -133,208 +133,245 @@ const ViewInvoices = (props) => {
 
   let timeResult = SplitTime(totalHoursWorked)
 
-  const divToDisplay = document.getElementById('invoicepdf');
-
-  // const styles = StyleSheet.create({
-  //   page: {
-  //     flexDirection: 'row',
-  //     backgroundColor: '#E4E4E4'
-  //   },
-  //   section: {
-  //     margin: 10,
-  //     padding: 10,
-  //     flexGrow: 1
-  //   }
-  // });
-
-  const generatePdf = (e) => {
-    e.preventDefault();
-    console.log("reaching pdf");
-
-    // ReactPDF.render(<MyDocument />, 'example.pdf');
-
-    // html2canvas(divToDisplay)
-    //   .then((canvas) => {
-    //     console.log("reaching");
-    //     const divImage = canvas.toDataURL("image/png");
-    //     const pdf = new jsPDF();
-    //     pdf.addImage(divImage, 'PNG', 0, 0);
-    //     // pdf.output('dataurlnewwindow');
-    //     pdf.save("download.pdf");
-    //   }).catch(err => console.log(err));
 
 
+
+  const openModal = () => {
+
+    // setEmployeeInvoiceId(id)
+    setModal(!modal);
+
+  };
+
+  const deleteInvoice = () => {
+    console.log("Invoice to delete:", id);
+
+    axios.delete(`${BASE_URL}/api/workerinvoices/${id}`).then((res) => {
+      if (res.status == 200) {
+        showNotification(
+          <span className='d-flex align-items-center'>
+            <Icon icon='EmojiSmile' size='lg' className='me-1' />
+            <span>Deleted Successfully</span>
+          </span>,
+          "The Invoice has been deleted successfully.", 'warning'
+        );
+        navigate(-1);
+
+      }
+      setModal(!modal);
+    }).catch(err => {
+      console.log(err);
+      showNotification(
+        <span className='d-flex align-items-center'>
+          <Icon icon='EmojiAngry' size='lg' className='me-1' />
+          <span>Some error occured</span>
+        </span>,
+        "Some error occured. Please check the details or try again later.", 'danger'
+      );
+    });
+  };
+
+
+  const exportPDF = () => {
+    resume.save();
   }
-
-
 
   return (
     <PageWrapper title="View Invoice">
+      <Modal isOpen={modal} toggle={openModal}>
+        <ModalHeader toggle={openModal}>Delete Employee Invoice</ModalHeader>
+        <ModalBody>Do you want to delete the employee Invoice?</ModalBody>
+        <ModalFooter>
+          <Button
+            color="primary"
+            className="btn-theme btn-sm"
+            onClick={deleteInvoice}
+          >
+            Yes Delete
+          </Button>{" "}
+          <Button
+            color="secondary"
+            className="btn-sm"
+            onClick={openModal}
+          >
+            Cancel
+          </Button>
+        </ModalFooter>
+      </Modal>
 
       <Page container='fluid' size="A4" id="invoicepdf">
-
         <div className='row' >
+          <PDFExport paperSize={'A4'}
+            fileName="download.pdf"
+            title="title"
+            subject="subject"
+            keywords=""
+            ref={(r) => setResume(r)}>
 
-          <div className='col-xxl-12 col-xl-6'>
+            <div style={{
+              height: 792,
+              width: 612,
+              padding: 'none',
+              backgroundColor: 'white',
+              boxShadow: '5px 5px 5px black',
+              margin: 'auto',
+              overflowX: 'hidden',
+              overflowY: 'hidden'
+            }}>
+              <div>
 
-            <Card className='shadow-3d-primary' >
-              <CardBody>
-                <div className='row g-5'>
-                  <div className='col-12'>
-                    <div className='d-flex align-items-center'>
-                      <div className='flex-shrink-0'>
+              <Card className='shadow-3d-primary'  >
+                <CardBody>
+                  <div className='row g-5'>
+                    <div className='col-12'>
+                      <div className='d-flex align-items-center'>
+                        <div className='flex-shrink-0'>
 
-                      </div>
-                      <div className='flex-grow-1 ms-3'>
-                        <div className='h2 fw-bold'>
-                          Invoice# {invoiceNumber}
                         </div>
+                        <div className='flex-grow-1 ms-3'>
+                          <div className='h2 fw-bold'>
+                            Invoice# {invoiceNumber}
+                          </div>
 
+                        </div>
                       </div>
                     </div>
-                  </div>
-
-                </div>
-              </CardBody>
-            </Card>
-
-
-
-            <Card
-              className='rounded-2'
-              tag='form'
-
-            >
-              <CardHeader>
-                <CardLabel icon='PointOfSale'>
-                  <CardTitle>Tax Invoice
-                    {"   "}
-                    <Button size='sm' color={status == 'Pending' ? 'warning' : 'success'}> {status}</Button>
-                  </CardTitle>
-                  <CardSubTitle>  Invoice Generated between dates <b>{startDate}</b>  and <b>{EndDate}</b></CardSubTitle>
-                </CardLabel>
-              </CardHeader>
-              <CardBody>
-                <div className='row g-4'>
-
-
-                  <div
-                    className='col-md-6'
-
-                  >
-                    From Employee
-                    <p className='h4'>   {employeeName}
-                    </p>
-
-
-
 
                   </div>
-                  <div
-                    className='col-md-6' >
-                    Invoice No #
-                    <p className='h4'>   {invoiceNumber}
-                    </p>
+                </CardBody>
+              </Card>
+              </div>
+              <Card>
+                <CardHeader>
+                  <CardLabel icon='PointOfSale'>
+                    <CardTitle>Tax Invoice
+
+                      <Button size='sm' color={status == 'Pending' ? 'warning' : 'success'}> {status}</Button>
+
+
+                    </CardTitle>
+                    <CardSubTitle>  Invoice Generated between dates <b>{startDate}</b>  and <b>{EndDate}</b></CardSubTitle>
+                  </CardLabel>
+                </CardHeader>
+                <CardBody>
+                  <div className='row g-4'>
+
+
+                    <div
+                      className='col-md-6'
+
+                    >
+                      From Employee
+                      <p className='h5'>   {employeeName}
+                      </p>
+                    </div>
+                    <div
+                      className='col-md-6' >
+                      Invoice No #
+                      <p className='h5'>   {invoiceNumber}
+                      </p>
+                    </div>
+                    <div
+                      className='col-md-6' >
+                      To
+                      <p className='h5'>   {employerName}
+                      </p>
+                    </div>
+                    <div
+                      className='col-md-6' >
+                      Date
+                      <p className='h5'>   {invoiceDate}
+                      </p>
+                    </div>
+
+                    <FormGroup
+                      className='col-md-6'>
+                    </FormGroup>
+                    <div
+                      className='col-md-6'>
+                      IRD Number
+                      <p className='h5'>   {IRDNumber}
+                      </p>
+                    </div>
+
+                    <table className='table table-modern'>
+                      <thead>
+                        <tr>
+                          <th>NO OF HOURS WORKED</th>
+                          <th>RATE PER HOUR</th>
+                          <th>TOTAL AMOUNT</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+
+                          <td><h6>{_.round(totalHoursWorked, 2)} hours ({`${timeResult.Days} Days ${timeResult.Hours} Hours and ${timeResult.Minutes} Mins.`})</h6></td>
+                          <td><h6>${ratePerHour}/hr</h6></td>
+                          <td><h6>${_.round(totalAmountExcludingGST, 2)}</h6></td>
+                        </tr>
+                        <tr>
+
+
+                          <td colspan="2" ><h6>TOTAL AMOUNT EXCLUDING GST</h6></td>
+                          <td ><h6>${_.round(totalAmountExcludingGST, 2)}</h6></td>
+                        </tr>
+                        <tr>
+
+                          <td colspan="2"><h6>20% WITHOLDING TAX</h6></td>
+                          <td ><h6>${_.round(taxAmount, 2)}</h6></td>
+                        </tr>
+                        <tr>
+
+                          <td colspan="2" ><h6>AMOUNT DIRECT CREDITED/NET PAY</h6></td>
+                          <td ><h6>${_.round(amountToPay, 2)}</h6></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <div
+                      className='col-md-8'>
+                      Please direct debit the above payment to the following bank account:
+                      <p className='h5'>   {bankAccountNumber}
+                      </p>
+                    </div>
+
+
+
                   </div>
-                  <div
-                    className='col-md-6' >
-                    To
-                    <p className='h4'>   {employerName}
-                    </p>
-                  </div>
-                  <div
-                    className='col-md-6' >
-                    Date
-                    <p className='h4'>   {invoiceDate}
-                    </p>
-                  </div>
+                </CardBody>
+              </Card>
 
-                  <FormGroup
-                    className='col-md-6'
-                  >
 
-                  </FormGroup>
-                  <div
-                    className='col-md-6'>
-                    IRD Number
-                    <p className='h4'>   {IRDNumber}
-                    </p>
-                  </div>
+            </div>
 
-                  <table className='table table-modern'>
-                    <thead>
-                      <tr>
+          </PDFExport>
+          <Card>
+            <CardFooter>
+              <CardFooterRight>
 
-                        <th>NO OF HOURS WORKED</th>
-                        <th>RATE PER HOUR</th>
-                        <th>TOTAL AMOUNT</th>
+                <Button type='submit' color='danger' icon='Delete' onClick={openModal}  >
+                  Delete Invoice
+                </Button>
+
+
+                <Button type='submit' color='info' icon='CloudDownload' onClick={exportPDF}  >
+                  Export to PDF
+                </Button>
+
+              </CardFooterRight>
+            </CardFooter>
+          </Card>
 
 
 
 
-
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-
-                        <td><h6>{_.round(totalHoursWorked, 2)} hours ({`${timeResult.Days} Days ${timeResult.Hours} Hours and ${timeResult.Minutes} Mins.`})</h6></td>
-                        <td><h6>${ratePerHour}/hr</h6></td>
-                        <td><h6>${_.round(totalAmountExcludingGST, 2)}</h6></td>
-                      </tr>
-                      <tr>
-
-
-                        <td colspan="2" ><h6>TOTAL AMOUNT EXCLUDING GST</h6></td>
-                        <td ><h6>${_.round(totalAmountExcludingGST, 2)}</h6></td>
-                      </tr>
-                      <tr>
-
-                        <td colspan="2"><h6>20% WITHOLDING TAX</h6></td>
-                        <td ><h6>${_.round(taxAmount, 2)}</h6></td>
-                      </tr>
-                      <tr>
-
-                        <td colspan="2" ><h6>AMOUNT DIRECT CREDITED/NET PAY</h6></td>
-                        <td ><h6>${_.round(amountToPay, 2)}</h6></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <div
-                    className='col-md-8'>
-                    Please direct debit the above payment to the following bank account:
-                    <p className='h4'>   {bankAccountNumber}
-                    </p>
-                  </div>
-
-
-
-                </div>
-              </CardBody>
-
-
-
-
-              <CardFooter>
-                <CardFooterRight>
-
-                
-
-                  <Button type='submit' color='info' icon='CloudDownload' onClick={generatePdf}  >
-                    Export to PDF
-                  </Button>
-
-                </CardFooterRight>
-              </CardFooter>
-
-            </Card>
-          </div>
-        </div>
-
-
-
+        </div >
       </Page>
-    </PageWrapper>
+
+
+
+
+
+    </PageWrapper >
   );
 };
 

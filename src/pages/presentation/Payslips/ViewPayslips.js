@@ -45,8 +45,7 @@ import {
 } from "reactstrap";
 import jwt_decode from 'jwt-decode';
 import _ from "lodash";
-import jsPDF from 'jspdf'
-import html2canvas from 'html2canvas';
+import { PDFExport } from '@progress/kendo-react-pdf';
 
 
 
@@ -74,9 +73,12 @@ const ViewPayslips = (props) => {
   const [IRDNumber, setIRDNumber] = useState();
 
   const [ratePerHour, setRatePerHour] = useState();
+  const navigate = useNavigate();
+  const [modal, setModal] = useState(false);
 
   const { id } = useParams();
   console.log("Invoice id is", id);
+  const [resume, setResume] = useState();
   // const itemData = tableData.filter((item) => item.id.toString() === id.toString());
   // const data = itemData[0];
 
@@ -112,6 +114,41 @@ const ViewPayslips = (props) => {
   }, [user.id]);
 
 
+  const openModal = () => {
+    // setEmployeeInvoiceId(id)
+    setModal(!modal);
+
+  };
+
+  const deletePayslip = () => {
+    console.log("Payslip to delete:", id);
+
+    axios.delete(`${BASE_URL}/api/workerpayslips/${id}`).then((res) => {
+      if (res.status == 200) {
+        showNotification(
+          <span className='d-flex align-items-center'>
+            <Icon icon='EmojiSmile' size='lg' className='me-1' />
+            <span>Deleted Successfully</span>
+          </span>,
+          "The Payslip has been deleted successfully.", 'warning'
+        );
+        navigate(-1);
+
+      }
+      setModal(!modal);
+    }).catch(err => {
+      console.log(err);
+      showNotification(
+        <span className='d-flex align-items-center'>
+          <Icon icon='EmojiAngry' size='lg' className='me-1' />
+          <span>Some error occured</span>
+        </span>,
+        "Some error occured. Please check the details or try again later.", 'danger'
+      );
+    });
+
+
+  };
 
 
 
@@ -126,184 +163,200 @@ const ViewPayslips = (props) => {
   let timeResult = SplitTime(totalHoursWorked)
 
 
-  // const styles = StyleSheet.create({
-  //   page: {
-  //     flexDirection: 'row',
-  //     backgroundColor: '#E4E4E4'
-  //   },
-  //   section: {
-  //     margin: 10,
-  //     padding: 10,
-  //     flexGrow: 1
-  //   }
-  // });
-  const divToDisplay = document.getElementById('invoicepdf');
-
-  const generatePdf = (e) => {
-    e.preventDefault();
-    console.log("reaching pdf");
-
-    // ReactPDF.render(<MyDocument />, 'example.pdf');
-
-    html2canvas(divToDisplay)
-      .then((canvas) => {
-        console.log("reaching");
-        const divImage = canvas.toDataURL("image/png");
-        const pdf = new jsPDF();
-        pdf.addImage(divImage, 'PNG', 0, 0);
-        // pdf.output('dataurlnewwindow');
-        pdf.save("download.pdf");
-      }).catch(err => console.log(err));
-
-
+  const exportPDF = () => {
+    resume.save();
   }
 
-
-
   return (
-    <PageWrapper title="View Invoice">
+    <PageWrapper title="View Payslip">
+      <Modal isOpen={modal} toggle={openModal}>
+        <ModalHeader toggle={openModal}>Delete Employee Payslip</ModalHeader>
+        <ModalBody>Do you want to delete the employee payslip?</ModalBody>
+        <ModalFooter>
+          <Button
+            color="primary"
+            className="btn-theme btn-sm"
+            onClick={deletePayslip}
+          >
+            Yes Delete
+          </Button>{" "}
+          <Button
+            color="secondary"
+            className="btn-sm"
+            onClick={openModal}
+          >
+            Cancel
+          </Button>
+        </ModalFooter>
+      </Modal>
 
-      <Page container='fluid' size="A4" id="invoicepdf">
-
+      <Page container='fluid' size="A4" >
         <div className='row' >
+          <PDFExport paperSize={'A4'}
+            fileName="download.pdf"
+            title="title"
+            subject="subject"
+            keywords=""
+            ref={(r) => setResume(r)}>
 
-          <div className='col-xxl-12 col-xl-6'>
+            <div style={{
+              height: 792,
+              width: 612,
+              padding: 'none',
+              backgroundColor: 'white',
+              boxShadow: '5px 5px 5px black',
+              margin: 'auto',
+              overflowX: 'hidden',
+              overflowY: 'hidden'
+            }}>
 
-            <Card className='shadow-3d-primary' >
-              <CardBody>
-                <div className='row g-5'>
-                  <div className='col-12'>
-                    <div className='d-flex align-items-center'>
-                      <div className='flex-shrink-0'>
+              <Card className='shadow-3d-primary' >
+                <CardBody>
+                  <div className='row g-5'>
+                    <div className='col-12'>
+                      <div className='d-flex align-items-center'>
+                        <div className='flex-shrink-0'>
 
-                      </div>
-                      <div className='flex-grow-1 ms-3'>
-                        <div className='h2 fw-bold'>
-                          Payslip# {payslipNumber}
                         </div>
+                        <div className='flex-grow-1 ms-3'>
+                          <div className='h2 fw-bold'>
+                            Payslip# {payslipNumber}
+                          </div>
 
+                        </div>
                       </div>
                     </div>
-                  </div>
-
-                </div>
-              </CardBody>
-            </Card>
-
-
-
-            <Card
-              className='rounded-2'
-              tag='form'
-
-            >
-              <CardHeader>
-                <CardLabel icon='PiggyBankFill'>
-                  <CardTitle>Payslip
-                    {"   "}
-                    <Button size='sm' color={status == 'Pending' ? 'warning' : 'success'}> {status}</Button>
-                  </CardTitle>
-                  <CardSubTitle>  Generated from Invoice Number - <b>{invoiceNumber} </b></CardSubTitle>
-                </CardLabel>
-              </CardHeader>
-              <CardBody>
-                <div className='row g-4'>
-
-
-                  <div
-                    className='col-md-6'
-
-                  >
-                    From Employer
-                    <p className='h4'>   {employerName}
-                    </p>
-
-
-
 
                   </div>
-                  <div
-                    className='col-md-6' >
-                    Payslip No #
-                    <p className='h4'>   {payslipNumber}
-                    </p>
+                </CardBody>
+              </Card>
+
+
+
+              <Card
+                className='rounded-2'
+                tag='form'
+
+              >
+                <CardHeader>
+                  <CardLabel icon='PiggyBankFill'>
+                    <CardTitle>Payslip
+                      {"   "}
+                      <Button size='sm' color={status == 'Pending' ? 'warning' : 'success'}> {status}</Button>
+                    </CardTitle>
+                    <CardSubTitle>  Generated from Invoice Number - <b>{invoiceNumber} </b></CardSubTitle>
+                  </CardLabel>
+                </CardHeader>
+                <CardBody>
+                  <div className='row g-4'>
+
+
+                    <div
+                      className='col-md-6'
+
+                    >
+                      From Employer
+                      <p className='h5'>   {employerName}
+                      </p>
+
+
+
+
+                    </div>
+                    <div
+                      className='col-md-6' >
+                      Payslip No #
+                      <p className='h5'>   {payslipNumber}
+                      </p>
+                    </div>
+                    <div
+                      className='col-md-6' >
+                      To
+                      <p className='h5'>   {employeeName}
+                      </p>
+                    </div>
+                    <div
+                      className='col-md-6' >
+                      Date
+                      <p className='h5'>   {payslipDate}
+                      </p>
+                    </div>
+
+                    <FormGroup
+                      className='col-md-6'
+                    >
+
+                    </FormGroup>
+                    <div
+                      className='col-md-6'>
+                      IRD Number
+                      <p className='h5'>   {IRDNumber}
+                      </p>
+                    </div>
+
+                    <table className='table table-modern'>
+                      <thead>
+                        <tr>
+
+                          <th>NO OF HOURS WORKED</th>
+                          <th>RATE PER HOUR</th>
+                          <th>AMOUNT DIRECT CREDITED/NET PAID</th>
+
+
+
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+
+                          <td><h6>{_.round(totalHoursWorked, 2)} hours ({`${timeResult.Days} Days ${timeResult.Hours} Hours and ${timeResult.Minutes} Mins.`})</h6></td>
+                          <td><h6>${ratePerHour}/hr</h6></td>
+                          <td><h6>${_.round(amountToPay, 2)}</h6></td>
+                        </tr>
+
+
+                      </tbody>
+                    </table>
+                    <p className='h6'> Note : Please contact your admin if you have any queries. </p>
+
+
+
                   </div>
-                  <div
-                    className='col-md-6' >
-                    To
-                    <p className='h4'>   {employeeName}
-                    </p>
-                  </div>
-                  <div
-                    className='col-md-6' >
-                    Date
-                    <p className='h4'>   {payslipDate}
-                    </p>
-                  </div>
+                </CardBody>
+              </Card>
 
-                  <FormGroup
-                    className='col-md-6'
-                  >
+            </div>
 
-                  </FormGroup>
-                  <div
-                    className='col-md-6'>
-                    IRD Number
-                    <p className='h4'>   {IRDNumber}
-                    </p>
-                  </div>
-
-                  <table className='table table-modern'>
-                    <thead>
-                      <tr>
-
-                        <th>NO OF HOURS WORKED</th>
-                        <th>RATE PER HOUR</th>
-                        <th>AMOUNT DIRECT CREDITED/NET PAID</th>
+          </PDFExport>
+          <Card>
 
 
+            <CardFooter>
+              <CardFooterRight>
 
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
+                <Button
+                  icon='Delete'
+                  color='danger'
+                  isLight
 
-                        <td><h6>{_.round(totalHoursWorked, 2)} hours ({`${timeResult.Days} Days ${timeResult.Hours} Hours and ${timeResult.Minutes} Mins.`})</h6></td>
-                        <td><h6>${ratePerHour}/hr</h6></td>
-                        <td><h6>${_.round(amountToPay, 2)}</h6></td>
-                      </tr>
+                  onClick={openModal}>
+                  Delete Payslip
+                </Button>
+                <Button type='submit' color='info' icon='CloudDownload' onClick={exportPDF}  >
+                  Export to PDF
+                </Button>
 
+              </CardFooterRight>
+            </CardFooter>
 
-                    </tbody>
-                  </table>
-
-
-
-
-                </div>
-              </CardBody>
-
-
-
-
-              <CardFooter>
-                <CardFooterRight>
-
-                  <Button type='submit' color='info' icon='CloudDownload' onClick={generatePdf}  >
-                    Export to PDF
-                  </Button>
-
-                </CardFooterRight>
-              </CardFooter>
-
-            </Card>
-          </div>
+          </Card>
         </div>
 
 
 
+
       </Page>
-    </PageWrapper>
+    </PageWrapper >
   );
 };
 
