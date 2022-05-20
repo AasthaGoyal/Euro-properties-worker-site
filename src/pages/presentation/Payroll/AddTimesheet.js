@@ -640,8 +640,7 @@ const AddTimesheet = (props) => {
   });
 
   const onSelectJobSite = (e) => {
-    console.log("selected jobsite", e.target.value);
-
+    
     setJobsiteId(e.target.value);
     if (e.target.value != " ") {
       setPunchinDisable(false);
@@ -657,15 +656,12 @@ const AddTimesheet = (props) => {
       let yyyy = today.getFullYear();
 
       today = dd + "/" + mm + "/" + yyyy;
-      console.log("Filtering by", employeeId, e.target.value, today);
-
+      
       let filterAttendance = _.filter(res.data, {
         employee: employeeId,
         jobsite: e.target.value,
         attendanceDate: today,
       });
-
-      console.log("filterAttendance:", filterAttendance);
 
       setAttendanceActivities(filterAttendance);
 
@@ -676,9 +672,8 @@ const AddTimesheet = (props) => {
         activities.push(attendance.activity);
       });
 
-      console.log("activities:", activities);
-
       if (activities[0] === "Punchin") {
+        console.log("reaching punchin");
         setPunchoutDisable(false);
         setPauseDisable(false);
         setPunchinDisable(true);
@@ -686,12 +681,14 @@ const AddTimesheet = (props) => {
 
       }
       else if (activities[0] === "Pause") {
+        console.log("reaching pause");
         setPunchoutDisable(true);
         setPauseDisable(true);
         setPunchinDisable(true);
         setResumeDisable(false);
 
       } else if (activities[0] === "Resume") {
+        console.log("reaching resume");
         setPunchoutDisable(false);
         setPauseDisable(true);
         setPunchinDisable(true);
@@ -699,12 +696,14 @@ const AddTimesheet = (props) => {
 
       }
       else if (activities[0] === "Punchout") {
+        console.log("reaching punchout");
         setPunchoutDisable(true);
         setPauseDisable(true);
-        setPunchinDisable(true);
+        setPunchinDisable(false);
         setResumeDisable(true);
 
       } else {
+        console.log("else condition");
         setPunchoutDisable(true);
         setPauseDisable(true);
         setPunchinDisable(false);

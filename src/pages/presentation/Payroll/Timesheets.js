@@ -55,6 +55,7 @@ const Timesheets = (props) => {
   const [jobsites, setJobsites] = useState([]);
   const [workerJobsites, setWorkerJobsites] = useState([]);
   const [filteredJobsite, setFilteredValue] = useState("All");
+  const [perPage, setPerPage] = useState(PER_COUNT['5']);
 
   console.log("the user is", user);
 
@@ -135,6 +136,7 @@ const Timesheets = (props) => {
 
       let breakResult = SplitTime(_.round(timesheet.breakHours, 2));
       let workResult = SplitTime(_.round(timesheet.totalWorkHours, 2));
+      console.log("work hours", workResult, timesheet.totalWorkHours);
 
       return (
         <tr key={timesheet._id}>
@@ -337,14 +339,14 @@ const Timesheets = (props) => {
               </tbody>
             </table>
           </CardBody>
-          {/* <PaginationButtons
-            data={tasks}
+          <PaginationButtons
+            data={timesheets}
             label='items'
             setCurrentPage={setCurrentPage}
             currentPage={currentPage}
             perPage={perPage}
             setPerPage={setPerPage}
-          /> */}
+          />
         </Card>
 
 
