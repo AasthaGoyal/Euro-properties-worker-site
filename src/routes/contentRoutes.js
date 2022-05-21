@@ -25,7 +25,7 @@ const JOBSITE = {
 const TASKS = {
   
 	LISTTASK: lazy(() => import('../pages/presentation/Tasks/ListAllTasks')),	
-  
+    EDITTASK: lazy(() => import('../pages/presentation/Tasks/EditTasks')),
 }
 
 const VEHICLES = {
@@ -126,6 +126,11 @@ const presentation = [
   {
 		path: demoPages.ViewTasks.path,
 		element: < TASKS.LISTTASK/>,
+		exact: true,
+	},
+	{
+		path: `/task-pages/EditTasks/:id`,
+		element: <TASKS.EDITTASK />,
 		exact: true,
 	},
   {
