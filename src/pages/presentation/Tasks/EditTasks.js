@@ -446,6 +446,7 @@ const EditTasks = () => {
 		});
 	}
 
+  
 	return (
 		<PageWrapper title='Edit User'>
 			<Modal isOpen={modal} toggle={openModal}>
@@ -498,7 +499,7 @@ const EditTasks = () => {
 									</div>
 									<div className='col-12'>
 										<Button
-											icon='Contacts'
+											icon='Easel'
 											color='success'
 											className='w-100 p-3'
 											isLight={TABS.TASK_COMPLETION !== activeTab}
@@ -508,7 +509,7 @@ const EditTasks = () => {
 									</div>
 									<div className='col-12'>
 										<Button
-											icon='Contacts'
+											icon='Flag'
 											color='warning'
 											className='w-100 p-3'
 											isLight={TABS.TASK_COMMENTS !== activeTab}
