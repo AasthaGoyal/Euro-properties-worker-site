@@ -1,4 +1,3 @@
-
 export const homeMenu = {
 	intro: { id: 'intro', text: 'Intro', path: '#intro', icon: 'Vrpano', subMenu: null },
 	bootstrap: {
@@ -52,52 +51,43 @@ export const demoPages = {
 		text: 'Add Time',
 		path: 'add-time',
 		icon: 'Calendar3',
-		subMenu: null
+		subMenu: null,
+	},
+	AddNewTimesheet: {
+		id: 'addNewTime',
+		text: 'Add New Timesheet',
+		path: 'add-newtime',
+		icon: 'Calendar',
+		subMenu: null,
 	},
 	ViewTimesheets: {
 		id: 'viewTimesheets',
 		text: 'My Timesheets',
 		path: 'view-timesheets',
 		icon: 'Clock',
-    subMenu: null
-    
+		subMenu: null,
 	},
 	ViewJobsites: {
 		id: 'viewJobsites',
 		text: 'My Jobsites',
 		path: 'view-jobsites',
 		icon: 'Business',
-    subMenu: null
+		subMenu: null,
 	},
-  ViewTasks: {
+	ViewTasks: {
 		id: 'viewTasks',
 		text: 'My Tasks',
 		path: 'view-tasks',
 		icon: 'Task',
-    subMenu: null
+		subMenu: null,
 	},
-  ViewVehicles: {
+	ViewVehicles: {
 		id: 'viewVehicles',
 		text: 'My Vehicles',
 		path: 'view-vehicles',
 		icon: 'Train',
-    subMenu: null
+		subMenu: null,
 	},
-  ListInvoices: {
-		id: 'listInvoices',
-		text: 'My Invoices',
-		path: 'list-invoices',
-		icon: 'CurrencyDollar',
-    subMenu: null
-	},
-  ListPayslips: {
-		id: 'listPayslips',
-		text: 'My Payslips',
-		path: 'list-payslips',
-		icon: 'CashCoin',
-    subMenu: null
-	},
-
 };
 
 export const componentsMenu = {
@@ -604,5 +594,3 @@ export const componentsMenu = {
 		icon: 'Anchor',
 	},
 };
-
-

@@ -11,38 +11,27 @@ const AUTH = {
 	PAGE_404: lazy(() => import('../pages/presentation/auth/Page404')),
 };
 const USER = {
-
-	VIEWUSERS: lazy(() => import('../pages/presentation/UserPages/ViewUser')),	
-  
+	VIEWUSERS: lazy(() => import('../pages/presentation/UserPages/ViewUser')),
 };
 
 const JOBSITE = {
- 
-	LISTJOBSITES: lazy(() => import('../pages/presentation/Jobsites/ListAllJobsites')),	
-  
-}
+	LISTJOBSITES: lazy(() => import('../pages/presentation/Jobsites/ListAllJobsites')),
+};
 
 const TASKS = {
-  
-	LISTTASK: lazy(() => import('../pages/presentation/Tasks/ListAllTasks')),	
-    EDITTASK: lazy(() => import('../pages/presentation/Tasks/EditTasks')),
-}
+	LISTTASK: lazy(() => import('../pages/presentation/Tasks/ListAllTasks')),
+	EDITTASK: lazy(() => import('../pages/presentation/Tasks/EditTasks')),
+};
 
 const VEHICLES = {
-  
-	LISTVEHICLE: lazy(() => import('../pages/presentation/Vehicles/ListAllVehicles')),	
-  
-}
-
+	LISTVEHICLE: lazy(() => import('../pages/presentation/Vehicles/ListAllVehicles')),
+};
 
 const PAYROLL = {
-  ADDTIMESHEET: lazy(() => import('../pages/presentation/Payroll/AddTimesheet')),	
-	LISTPAYSLIPS: lazy(() => import('../pages/presentation/Payslips/ListPayslips')),	
-  VIEWPAYSLIPS: lazy(() => import('../pages/presentation/Payslips/ViewPayslips')),	
-  TIMESHEETS: lazy(() => import('../pages/presentation/Payroll/Timesheets')),
-  LISTINVOICES: lazy(() => import('../pages/presentation/Invoices/ListInvoices')),
-  VIEWINVOICES: lazy(() => import('../pages/presentation/Invoices/ViewInvoices')),
-}
+	ADDTIMESHEET: lazy(() => import('../pages/presentation/Payroll/AddTimesheet')),
+	ADDNEWTIMESHEET: lazy(() => import('../pages/presentation/Payroll/AddNewTimesheet')),
+	TIMESHEETS: lazy(() => import('../pages/presentation/Payroll/Timesheets')),
+};
 // const PAGE_LAYOUTS = {
 // 	HEADER_SUBHEADER: lazy(() => import('../pages/presentation/page-layouts/HeaderAndSubheader')),
 // 	HEADER: lazy(() => import('../pages/presentation/page-layouts/OnlyHeader')),
@@ -63,69 +52,54 @@ const presentation = [
 		exact: true,
 	},
 	{
-		path: "/auth-pages/404",
+		path: '/auth-pages/404',
 		element: <AUTH.PAGE_404 />,
 		exact: true,
 	},
 	{
-		path: "/",
+		path: '/',
 		element: <Login />,
 		exact: true,
 	},
-  {
-		path:"/forget-password",
+	{
+		path: '/forget-password',
 		element: <ForgetPassword />,
 		exact: true,
 	},
-  {
-    path:"/reset-password/token/:token",
+	{
+		path: '/reset-password/token/:token',
 		element: <ResetPassword />,
 		exact: true,
-
-  },
-  {
+	},
+	{
 		path: `/user-pages/editUsers/:id`,
 		element: <USER.VIEWUSERS />,
 		exact: true,
 	},
-  {
+	{
 		path: demoPages.AddTimesheet.path,
-		element: < PAYROLL.ADDTIMESHEET/>,
+		element: <PAYROLL.ADDTIMESHEET />,
 		exact: true,
 	},
-  {
+	{
+		path: demoPages.AddNewTimesheet.path,
+		element: <PAYROLL.ADDNEWTIMESHEET />,
+		exact: true,
+	},
+	{
 		path: demoPages.ViewTimesheets.path,
-		element: < PAYROLL.TIMESHEETS/>,
+		element: <PAYROLL.TIMESHEETS />,
 		exact: true,
 	},
-  {
-		path: demoPages.ListInvoices.path,
-		element: < PAYROLL.LISTINVOICES/>,
-		exact: true,
-	},
-  {
-		path:`/view-invoices/:id`,
-		element: < PAYROLL.VIEWINVOICES/>,
-		exact: true,
-	},
-  {
-		path: demoPages.ListPayslips.path,
-		element: < PAYROLL.LISTPAYSLIPS/>,
-		exact: true,
-	},
-  {
-		path:`/view-payslips/:id`,
-		element: < PAYROLL.VIEWPAYSLIPS/>,
-		exact: true,
-	},
-  {
+
+	{
 		path: demoPages.ViewJobsites.path,
-		element: < JOBSITE.LISTJOBSITES/>,
+		element: <JOBSITE.LISTJOBSITES />,
 		exact: true,
 	},
-  {
+	{
 		path: demoPages.ViewTasks.path,
-		element: < TASKS.LISTTASK/>,
+		element: <TASKS.LISTTASK />,
 		exact: true,
 	},
 	{
@@ -133,15 +107,11 @@ const presentation = [
 		element: <TASKS.EDITTASK />,
 		exact: true,
 	},
-  {
+	{
 		path: demoPages.ViewVehicles.path,
-		element: < VEHICLES.LISTVEHICLE/>,
+		element: <VEHICLES.LISTVEHICLE />,
 		exact: true,
 	},
-
-
-
-
 ];
 const contents = [...presentation];
 
